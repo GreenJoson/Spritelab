@@ -1,4 +1,4 @@
-name: Build Windows EXE
+name: Build SpriteLab
 
 on:
   push:
@@ -25,13 +25,13 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --windowed --name "SpriteSheetSplitter" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
+        pyinstaller --windowed --name "SpriteLab" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SpriteSheetSplitter-Windows
-        path: dist/SpriteSheetSplitter/
+        name: SpriteLab-Windows
+        path: dist/SpriteLab/
 
   build-macos:
     runs-on: macos-latest
@@ -51,10 +51,10 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --windowed --name "SpriteSheetSplitter" --add-data "sprite_splitter.py:." --add-data "i18n.py:." gui.py
+        pyinstaller --windowed --name "SpriteLab" --add-data "sprite_splitter.py:." --add-data "i18n.py:." gui.py
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SpriteSheetSplitter-macOS
-        path: dist/SpriteSheetSplitter.app/
+        name: SpriteLab-macOS
+        path: dist/SpriteLab.app/

@@ -1,9 +1,9 @@
 @echo off
-REM Windows 打包脚本 - Sprite Sheet Splitter
+REM Windows 打包脚本 - SpriteLab
 REM 使用方法: 在Windows上双击运行此脚本
 
 echo ========================================
-echo  Sprite Sheet Splitter Windows 打包脚本
+echo  SpriteLab Windows 打包脚本
 echo ========================================
 echo.
 
@@ -25,14 +25,15 @@ pip install --upgrade pip
 pip install pillow pyinstaller
 
 echo [3/4] 开始打包...
-pyinstaller --windowed --name "SpriteSheetSplitter" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
+pyinstaller --windowed --name "SpriteLab" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
 
 echo [4/4] 打包完成!
 echo.
 echo ========================================
 echo  打包完成!
-echo  EXE文件位置: dist\SpriteSheetSplitter\SpriteSheetSplitter.exe
+echo  EXE文件位置: dist\SpriteLab\SpriteLab.exe
 echo ========================================
 echo.
 
 pause
+
