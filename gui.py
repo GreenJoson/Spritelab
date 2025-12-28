@@ -23,7 +23,8 @@ from pathlib import Path
 from sprite_splitter import SpriteSplitter, SpriteRect
 
 # 导入多语言支持
-import i18n
+# 导入多语言支持
+from i18n import i18n
 # 导入版本检查
 from version_checker import version_checker
 
