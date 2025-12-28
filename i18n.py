@@ -8,7 +8,7 @@
 LANGUAGES = {
     "zh": {
         # 窗口标题
-        "app_title": "SpriteLab v1.0.1 - 精灵表拆分器 | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.5 - 精灵表拆分器 | SpriteLab.app",
 
         # 菜单
         "menu_file": "文件",
@@ -17,6 +17,9 @@ LANGUAGES = {
         "menu_export": "导出数据文件",
         "menu_exit": "退出",
         "menu_edit": "编辑",
+        "menu_view": "视图",
+        "menu_zoom_in": "放大",
+        "menu_zoom_out": "缩小",
         "menu_clear": "清除",
         "menu_help": "帮助",
         "menu_usage": "使用说明",
@@ -127,7 +130,7 @@ LANGUAGES = {
         # 帮助
         "help_title": "使用说明",
         "about_title": "关于",
-        "opensource_hint": "免费版 v1.0.1 | SpriteLab.app",
+        "opensource_hint": "免费版 v1.0.5 | SpriteLab.app",
 
         # 预览提示
         "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
@@ -144,7 +147,7 @@ LANGUAGES = {
 
     "en": {
         # Window title
-        "app_title": "SpriteLab v1.0.1 - Sprite Sheet Splitter | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.5 - Sprite Sheet Splitter | SpriteLab.app",
 
         # Menu
         "menu_file": "File",
@@ -153,6 +156,9 @@ LANGUAGES = {
         "menu_export": "Export Data File",
         "menu_exit": "Exit",
         "menu_edit": "Edit",
+        "menu_view": "View",
+        "menu_zoom_in": "Zoom In",
+        "menu_zoom_out": "Zoom Out",
         "menu_clear": "Clear",
         "menu_help": "Help",
         "menu_usage": "Usage Guide",
@@ -263,7 +269,7 @@ LANGUAGES = {
         # Help
         "help_title": "Usage Guide",
         "about_title": "About",
-        "opensource_hint": "Free Version v1.0.1 | SpriteLab.app",
+        "opensource_hint": "Free Version v1.0.5 | SpriteLab.app",
 
         # Preview hint
         "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",

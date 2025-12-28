@@ -77,41 +77,42 @@ class SpriteSheetSplitterGUI:
         """创建菜单栏"""
         menubar = tk.Menu(self.root)
         self.root.config(menu=menubar)
+        self.menubar = menubar # 保存引用以便后续操作
 
         # 文件菜单
         file_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="文件", menu=file_menu)
-        file_menu.add_command(label="打开图片...", command=self.open_image, accelerator="Cmd+O")
-        file_menu.add_command(label="打开数据文件...", command=self.open_data_file)
+        menubar.add_cascade(label=i18n.t("menu_file"), menu=file_menu)
+        file_menu.add_command(label=i18n.t("menu_open"), command=self.open_image, accelerator="Cmd+O")
+        file_menu.add_command(label=i18n.t("menu_data"), command=self.open_data_file)
         file_menu.add_separator()
-        file_menu.add_command(label="保存精灵...", command=self.save_sprites, accelerator="Cmd+S")
-        file_menu.add_command(label="导出数据文件...", command=self.export_data)
+        file_menu.add_command(label=i18n.t("menu_save"), command=self.save_sprites, accelerator="Cmd+S")
+        file_menu.add_command(label=i18n.t("menu_export"), command=self.export_data)
         file_menu.add_separator()
-        file_menu.add_command(label="退出", command=self.root.quit, accelerator="Cmd+Q")
+        file_menu.add_command(label=i18n.t("menu_exit"), command=self.root.quit, accelerator="Cmd+Q")
 
         # 编辑菜单
         edit_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="编辑", menu=edit_menu)
-        edit_menu.add_command(label="执行拆分", command=self.do_split)
-        edit_menu.add_command(label="清除", command=self.clear_all)
+        menubar.add_cascade(label=i18n.t("menu_edit"), menu=edit_menu)
+        edit_menu.add_command(label=i18n.t("toolbar_split"), command=self.do_split)
+        edit_menu.add_command(label=i18n.t("menu_clear"), command=self.clear_all)
 
         # 视图菜单
         view_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="视图", menu=view_menu)
-        view_menu.add_command(label="放大", command=lambda: self.zoom(1.2), accelerator="Cmd++")
-        view_menu.add_command(label="缩小", command=lambda: self.zoom(0.8), accelerator="Cmd+-")
-        view_menu.add_command(label="适应窗口", command=self.fit_to_window)
+        menubar.add_cascade(label=i18n.t("menu_view"), menu=view_menu)
+        view_menu.add_command(label=i18n.t("menu_zoom_in"), command=lambda: self.zoom(1.2), accelerator="Cmd++")
+        view_menu.add_command(label=i18n.t("menu_zoom_out"), command=lambda: self.zoom(0.8), accelerator="Cmd+-")
+        view_menu.add_command(label=i18n.t("toolbar_fit"), command=self.fit_to_window)
         view_menu.add_command(label="1:1", command=lambda: self.set_zoom(1.0))
 
         # 帮助菜单
         help_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="帮助", menu=help_menu)
-        help_menu.add_command(label="使用说明", command=self.show_help)
-        help_menu.add_command(label="关于", command=self.show_about)
+        menubar.add_cascade(label=i18n.t("menu_help"), menu=help_menu)
+        help_menu.add_command(label=i18n.t("menu_usage"), command=self.show_help)
+        help_menu.add_command(label=i18n.t("menu_about"), command=self.show_about)
 
         # 语言菜单
         self.lang_menu = tk.Menu(menubar, tearoff=0)
-        menubar.add_cascade(label="🌐 Language", menu=self.lang_menu)
+        menubar.add_cascade(label=i18n.t("menu_language"), menu=self.lang_menu)
 
         # 使用变量来标记当前语言
         self.lang_var = tk.StringVar(value=i18n.get_language())
@@ -1457,6 +1458,12 @@ class SpriteSheetSplitterGUI:
         # 实时更新Canvas提示文本
         if self.hint_text:
             self.canvas.itemconfig(self.hint_text, text=i18n.t("preview_hint"))
+
+        # 刷新菜单
+        self._create_menu()
+
+        # 更新标题
+        self.root.title(i18n.t("app_title"))
 
         # 提示用户需要重启应用
         if lang == "zh":
