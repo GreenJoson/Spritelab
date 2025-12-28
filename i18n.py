@@ -8,7 +8,7 @@
 LANGUAGES = {
     "zh": {
         # 窗口标题
-        "app_title": "SpriteLab v1.0.6 - 精灵表拆分器 | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.7 - 精灵表拆分器 | SpriteLab.app",
 
         # 菜单
         "menu_file": "文件",
@@ -116,9 +116,10 @@ LANGUAGES = {
 
         # 消息
         "msg_load_image": "请先加载图片",
+        "msg_load_image": "请先加载图片",
         "msg_do_split": "请先执行拆分操作",
-        "msg_select_sprite": "请先选中要删除的精灵",
-        "msg_select_data": "请选择数据文件",
+        "err_no_image": "请加载图片",
+        "err_no_sprites": "请先执行拆分",
         "msg_no_sprites": "没有精灵需要编号",
         "msg_delete_all": "确定要删除全部精灵吗？",
         "msg_save_success": "已保存 {count} 个精灵到:\n{path}",
@@ -130,7 +131,7 @@ LANGUAGES = {
         # 帮助
         "help_title": "使用说明",
         "about_title": "关于",
-        "opensource_hint": "免费版 v1.0.6 | SpriteLab.app",
+        "opensource_hint": "免费版 v1.0.7 | SpriteLab.app",
 
         # 预览提示
         "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
@@ -140,6 +141,60 @@ LANGUAGES = {
         "ctx_renumber": "重新编号",
         "ctx_delete_all": "全部删除",
 
+        # 帮助长文本
+        "help_text": """
+精灵表拆分器使用说明:
+
+1. 打开精灵表图片
+   - 拖拽图片到窗口
+   - 使用 Cmd+V 粘贴图片文件路径
+   - 使用 Cmd+O 快捷键打开
+
+2. 选择拆分模式
+   - Grid: 按固定网格拆分，适合规则排列的精灵
+   - Rectangular: 自动检测透明边界分隔的区域
+   - 数据文件: 使用JSON数据文件拆分
+
+3. 配置拆分参数
+   - Grid模式: 设置列数/行数或精灵尺寸
+   - Rectangular模式: 设置最小尺寸和Alpha阈值
+   - 数据文件模式: 选择JSON文件
+
+4. 执行拆分
+   - 点击工具栏的"执行拆分"按钮(放大镜图标)
+   - 检查预览区域是否正确识别了精灵
+
+5. 保存精灵
+   - 点击"保存精灵"按钮
+   - 配置输出目录和命名模板
+
+命名模板支持的变量:
+{name} - 原文件名
+{index} - 精灵索引
+{x}, {y} - 位置坐标
+{width}, {height} - 尺寸
+""",
+        "about_text": """
+精灵表拆分器 (Sprite Sheet Splitter)
+
+版本: {version}
+作者: AI Assistant
+
+这是一个模仿TexturePacker功能的简易版本，
+使用Python + Pillow + tkinter实现。
+
+功能特性:
+- Grid模式网格拆分
+- Rectangular模式自动检测
+- Data File模式数据文件拆分
+- 实时预览和缩放
+- 选中精灵高亮显示
+- 自定义输出设置
+- 多语言支持
+
+开源免费，欢迎使用和贡献！
+""",
+
         # 更新
         "update_available": "发现新版本: {version}",
         "btn_update": "⬇️ 更新",
@@ -147,7 +202,7 @@ LANGUAGES = {
 
     "en": {
         # Window title
-        "app_title": "SpriteLab v1.0.6 - Sprite Sheet Splitter | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.7 - Sprite Sheet Splitter | SpriteLab.app",
 
         # Menu
         "menu_file": "File",
@@ -255,8 +310,10 @@ LANGUAGES = {
 
         # Messages
         "msg_load_image": "Please load an image first",
+        "msg_load_image": "Please load an image first",
         "msg_do_split": "Please split the image first",
-        "msg_select_sprite": "Please select a sprite to delete",
+        "err_no_image": "Please load an image",
+        "err_no_sprites": "Please split first",
         "msg_select_data": "Please select a data file",
         "msg_no_sprites": "No sprites to renumber",
         "msg_delete_all": "Delete all sprites?",
@@ -269,10 +326,64 @@ LANGUAGES = {
         # Help
         "help_title": "Usage Guide",
         "about_title": "About",
-        "opensource_hint": "Free Version v1.0.6 | SpriteLab.app",
+        "opensource_hint": "Free Version v1.0.7 | SpriteLab.app",
 
         # Preview hint
         "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",
+
+        # Help long text
+        "help_text": """
+Usage Guide:
+
+1. Open Sprite Sheet
+   - Drag & drop image to window
+   - Paste image path (Cmd+V)
+   - Use Open Image shortcut (Cmd+O)
+
+2. Select Split Mode
+   - Grid: Fixed grid splitting
+   - Rectangular: Auto detect regions by transparent boundaries
+   - Data File: Split using JSON data
+
+3. Configure Parameters
+   - Grid: Set columns/rows or sprite size
+   - Rectangular: Set min size and alpha threshold
+   - Data File: Select JSON file
+
+4. Execute Split
+   - Click 'Split' button (magnifier icon)
+   - Check preview area
+
+5. Save Sprites
+   - Click 'Save Sprites' button
+   - Configure output dir and name template
+
+Name Template Variables:
+{name} - Original filename
+{index} - Sprite index
+{x}, {y} - Position
+{width}, {height} - Size
+""",
+        "about_text": """
+SpriteLab - Sprite Sheet Splitter
+
+Version: {version}
+Author: AI Assistant
+
+A simple alternative to TexturePacker,
+built with Python + Pillow + tkinter.
+
+Features:
+- Grid mode splitting
+- Rectangular auto-detection
+- Data file splitting
+- Real-time preview & zoom
+- Sprite highlighting
+- Custom output settings
+- Multi-language support
+
+Open source & free!
+""",
 
         # Update
         "update_available": "New version: {version}",

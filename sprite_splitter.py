@@ -17,6 +17,7 @@ import json
 import argparse
 from PIL import Image
 from dataclasses import dataclass
+from i18n import i18n
 from typing import List, Tuple, Optional, Dict
 from pathlib import Path
 
@@ -793,10 +794,10 @@ class SpriteSplitter:
             预览图Image对象
         """
         if not self.image:
-            raise ValueError("请先加载图片")
+            raise ValueError(i18n.t("err_no_image"))
 
         if not self.sprites:
-            raise ValueError("请先执行拆分操作")
+            raise ValueError(i18n.t("err_no_sprites"))
 
         from PIL import ImageDraw, ImageFont
 

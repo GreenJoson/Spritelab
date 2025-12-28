@@ -1227,7 +1227,8 @@ class SpriteSheetSplitterGUI:
         )
 
         self.sprite_listbox.delete(0, tk.END)
-        self.sprite_count_label.config(text="共 0 个精灵")
+        self.sprite_listbox.delete(0, tk.END)
+        self.sprite_count_label.config(text=i18n.t("sprite_count", count=0))
         self.status_label.config(text="就绪")
         self.size_label.config(text="")
 
@@ -1354,69 +1355,13 @@ class SpriteSheetSplitterGUI:
             self.zoom(0.9)
 
     def show_help(self):
-        """显示帮助信息"""
-        help_text = """
-精灵表拆分器使用说明:
-
-1. 打开精灵表图片
-   - 点击"打开图片"按钮
-   - 双击预览区域打开文件选择器
-   - 使用 Cmd+V 粘贴图片文件路径
-   - 使用 Cmd+O 快捷键打开
-   - 将图片拖放到应用图标启动
-
-2. 选择拆分模式
-   - Grid: 按固定网格拆分，适合规则排列的精灵
-   - Rectangular: 自动检测透明边界分隔的区域
-   - 数据文件: 使用JSON数据文件拆分
-
-3. 配置拆分参数
-   - Grid模式: 设置列数/行数或精灵尺寸
-   - Rectangular模式: 设置最小尺寸和Alpha阈值
-   - 数据文件模式: 选择JSON文件
-
-4. 执行拆分
-   - 点击"执行拆分"按钮
-   - 预览区域会显示拆分结果
-   - 蓝色边框标识图片范围
-   - 白色网格线标识精灵边界
-   - 点击精灵可高亮选中
-
-5. 保存精灵
-   - 设置输出目录和命名模板
-   - 点击"保存精灵"按钮
-
-命名模板支持的变量:
-{name} - 精灵名称
-{index} - 精灵索引
-{x}, {y} - 位置坐标
-{width}, {height} - 精灵尺寸
-        """
-        messagebox.showinfo("使用说明", help_text)
+        """显示帮助"""
+        messagebox.showinfo(i18n.t("help_title"), i18n.t("help_text"))
 
     def show_about(self):
-        """显示关于信息"""
-        about_text = """
-精灵表拆分器 (Sprite Sheet Splitter)
-
-版本: 1.0.0
-作者: AI Assistant
-
-这是一个模仿TexturePacker功能的简易版本，
-使用Python + Pillow + tkinter实现。
-
-功能特性:
-- Grid模式网格拆分
-- Rectangular模式自动检测
-- Data File模式数据文件拆分
-- 实时预览和缩放（蓝色边框+白色网格）
-- 选中精灵高亮显示
-- 自定义输出设置
-- 多语言支持（中文/英文）
-
-开源免费，欢迎使用和贡献！
-        """
-        messagebox.showinfo("关于", about_text)
+        """显示关于"""
+        from version_checker import CURRENT_VERSION
+        messagebox.showinfo(i18n.t("about_title"), i18n.t("about_text", version=CURRENT_VERSION))
 
     def check_updates(self):
         """检查更新"""
@@ -1466,18 +1411,19 @@ class SpriteSheetSplitterGUI:
         self.root.title(i18n.t("app_title"))
 
         # 提示用户需要重启应用
-        if lang == "zh":
-            msg = "语言已切换为中文。\n\n部分界面需要重启应用后生效。\n\n是否现在重启？"
-            title = "语言切换"
-        else:
-            msg = "Language changed to English.\n\nSome UI changes require restart.\n\nRestart now?"
-            title = "Language Changed"
+        # 提示用户需要重启应用
+        # if lang == "zh":
+        #     msg = "语言已切换为中文。\n\n部分界面需要重启应用后生效。\n\n是否现在重启？"
+        #     title = "语言切换"
+        # else:
+        #     msg = "Language changed to English.\n\nSome UI changes require restart.\n\nRestart now?"
+        #     title = "Language Changed"
 
-        if messagebox.askyesno(title, msg):
-            # 重启应用
-            self.root.destroy()
-            python = sys.executable
-            os.execl(python, python, *sys.argv)
+        # if messagebox.askyesno(title, msg):
+        #     # 重启应用
+        #     self.root.destroy()
+        #     python = sys.executable
+        #     os.execl(python, python, *sys.argv)
 
 def get_config_path():
     """获取配置文件路径 - 使用用户目录"""
