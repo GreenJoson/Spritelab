@@ -581,7 +581,7 @@ class SpriteSheetSplitterGUI:
         self.canvas.delete(self.hint_text)
         self.hint_text = self.canvas.create_text(
             200, 150,
-            text="空...\n\n双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
+            text=i18n.t("preview_hint"),
             fill='#888888',
             font=('Helvetica', 14),
             justify=tk.CENTER
@@ -1220,7 +1220,7 @@ class SpriteSheetSplitterGUI:
         self.canvas.delete("all")
         self.hint_text = self.canvas.create_text(
             200, 150,
-            text="空...\n\n拖动精灵表图片到这里\n或点击'打开图片'按钮",
+            text=i18n.t("preview_hint"),
             fill='#888888',
             font=('Helvetica', 14),
             justify=tk.CENTER
