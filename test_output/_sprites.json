@@ -1,0 +1,23 @@
+{
+  "image": "uploaded_image_1766831665424.png",
+  "size": {
+    "width": 1024,
+    "height": 629
+  },
+  "sprites": [
+    {
+      "name": "sprite_0000",
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 314
+    },
+    {
+      "name": "sprite_0001",
+      "x": 0,
+      "y": 314,
+      "width": 1024,
+      "height": 314
+    }
+  ]
+}
