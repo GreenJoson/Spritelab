@@ -130,12 +130,16 @@ LANGUAGES = {
         "opensource_hint": "免费版 v1.0.1 | SpriteLab.app",
 
         # 预览提示
-        "preview_hint": "空...\n\n双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
+        "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
 
         # 右键菜单
         "ctx_delete": "删除选中精灵",
         "ctx_renumber": "重新编号",
         "ctx_delete_all": "全部删除",
+
+        # 更新
+        "update_available": "发现新版本: {version}",
+        "btn_update": "⬇️ 更新",
     },
 
     "en": {
@@ -262,7 +266,11 @@ LANGUAGES = {
         "opensource_hint": "Free Version v1.0.1 | SpriteLab.app",
 
         # Preview hint
-        "preview_hint": "Empty...\n\nDouble-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",
+        "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",
+
+        # Update
+        "update_available": "New version: {version}",
+        "btn_update": "⬇️ Update",
 
         # Context menu
         "ctx_delete": "Delete Selected Sprite",

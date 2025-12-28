@@ -23,7 +23,9 @@ from pathlib import Path
 from sprite_splitter import SpriteSplitter, SpriteRect
 
 # 导入多语言支持
-from i18n import i18n
+import i18n
+# 导入版本检查
+from version_checker import version_checker
 
 
 class SpriteSheetSplitterGUI:
@@ -142,7 +144,20 @@ class SpriteSheetSplitterGUI:
         self.zoom_label.pack(side=tk.LEFT)
         ttk.Button(toolbar, text="+", width=3, command=lambda: self.zoom(1.2)).pack(side=tk.LEFT)
         ttk.Button(toolbar, text="1:1", command=lambda: self.set_zoom(1.0)).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="1:1", command=lambda: self.set_zoom(1.0)).pack(side=tk.LEFT, padx=2)
         ttk.Button(toolbar, text=i18n.t("toolbar_fit"), command=self.fit_to_window).pack(side=tk.LEFT, padx=2)
+
+        # 更新按钮（默认隐藏，有更新时显示）
+        self.update_btn_frame = ttk.Frame(toolbar)
+        self.update_btn_frame.pack(side=tk.RIGHT, padx=10)
+        self.update_btn = ttk.Button(
+            self.update_btn_frame,
+            text=i18n.t("btn_update"),
+            command=self.open_update_url,
+            style='Accent.TButton'
+        )
+        # 初始检查更新
+        self.root.after(2000, self.check_updates)
 
     def _create_main_layout(self):
         """创建主布局"""
@@ -1401,12 +1416,46 @@ class SpriteSheetSplitterGUI:
         """
         messagebox.showinfo("关于", about_text)
 
+    def check_updates(self):
+        """检查更新"""
+        def on_update_found(data):
+            # 在主线程更新UI
+            self.update_data = data
+            version = data.get('version', '')
+            self.root.after(0, lambda: self._show_update_ui(version))
+
+        version_checker.set_callback(on_update_found)
+        version_checker.check_for_updates()
+
+    def _show_update_ui(self, version):
+        """显示更新UI"""
+        self.update_btn.configure(text=f"{i18n.t('btn_update')} {version}")
+        self.update_btn.pack(side=tk.RIGHT)
+
+        # 状态栏提示
+        msg = i18n.t('update_available', version=version)
+        self.status_label.config(text=msg, foreground='blue')
+
+    def open_update_url(self):
+        """打开更新链接"""
+        url = "https://spritelab.app"
+        if hasattr(self, 'update_data') and self.update_data.get('download_url'):
+            url = self.update_data['download_url']
+
+        import webbrowser
+        webbrowser.open(url)
+
+
     def change_language(self, lang: str):
         """切换语言"""
         i18n.set_language(lang)
 
         # 保存语言配置到用户目录
         save_language_config(lang)
+
+        # 实时更新Canvas提示文本
+        if self.hint_text:
+            self.canvas.itemconfig(self.hint_text, text=i18n.t("preview_hint"))
 
         # 提示用户需要重启应用
         if lang == "zh":
