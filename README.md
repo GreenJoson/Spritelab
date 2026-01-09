@@ -1,77 +1,136 @@
-# 🎮 SpriteLab - 精灵表拆分器
+# SpriteLab · AI Game Asset Generator & Sprite Splitter
 
-[![Build SpriteLab](https://github.com/GreenJoson/Spritelab/actions/workflows/build.yml/badge.svg)](https://github.com/GreenJoson/Spritelab/actions/workflows/build.yml)
+[English](README.md) | [简体中文](#简体中文)
 
-**官网: [SpriteLab.app](https://spritelab.app)**
+[![GitHub](https://img.shields.io/badge/GitHub-SpriteLab-181717?logo=github)](https://github.com/GreenJoson/Spritelab)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-一个功能强大的精灵表/精灵图拆分工具，支持多种拆分模式和智能检测。
-
-![SpriteLab Screenshot](icon.png)
-
-## ✨ 功能特性
-
-### 拆分模式
-- **Grid模式** - 按行列数均匀拆分
-- **Rectangular模式** - 自动识别精灵边界（支持透明背景和纯色背景）
-- **Data File模式** - 使用JSON数据文件拆分
-
-### 智能功能
-- 🔍 **智能背景检测** - 自动识别透明或纯色背景
-- ✂️ **边缘裁剪** - 去除精灵边缘分隔线
-- 🎨 **智能去背景** - 从边缘去除纯色背景，保留内部
-- 📐 **批量调整大小** - 按比例或自定义尺寸批量缩放
-
-### 其他特性
-- 🌐 多语言支持（中文/English）
-- 💾 导出JSON数据文件
-- 🖼️ 实时预览
-- 🗑️ 精灵管理（删除、重新编号）
-
-## 📥 下载
-
-### macOS
-从 [Releases](https://github.com/GreenJoson/Spritelab/releases) 下载 `SpriteLab-macOS.zip`
-
-### Windows
-从 [Releases](https://github.com/GreenJoson/Spritelab/releases) 下载 `SpriteLab-Windows.zip`
-
-## 🛠️ 从源码运行
-
-### 依赖安装
-```bash
-pip install -r requirements.txt
-```
-
-### 运行
-```bash
-python gui.py
-```
-
-## 📦 打包
-
-### macOS
-```bash
-pyinstaller --windowed --name "SpriteLab" --icon icon.icns --add-data "sprite_splitter.py:." --add-data "i18n.py:." gui.py
-```
-
-### Windows
-双击运行 `build_windows.bat` 或：
-```cmd
-pyinstaller --windowed --name "SpriteLab" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
-```
-
-## 📝 使用说明
-
-1. **打开图片** - 点击"打开图片"按钮或拖放图片
-2. **选择模式** - Grid/Rectangular/数据文件
-3. **配置参数** - 设置行列数或最小尺寸
-4. **执行拆分** - 点击"执行拆分"
-5. **保存精灵** - 选择输出目录，点击"保存精灵"
-
-## 📄 License
-
-MIT License
+SpriteLab is a powerful suite for game developers to create and manage game assets. It features an AI-powered asset generator and a high-performance sprite sheet splitter.
 
 ---
 
-**SpriteLab.app** - 让精灵拆分变得简单！
+## English
+
+SpriteLab turns prompts into game-ready art (backgrounds, characters, UI, icons, sprite animations) via Google Gemini 2.0 Images (through ZenMux).
+
+### Main Components
+- **SpriteLab Web**: AI Generation platform (FastAPI + Celery + Redis + React).
+- **SpriteLab Tool**: Desktop Sprite Sheet Splitter (Python + Tkinter) for offline asset processing.
+
+### Repo & Downloads
+- **Code**: [GitHub Repository](https://github.com/GreenJoson/Spritelab)
+- **CI Builds**: GitHub Actions → **Build SpriteLab** workflow → artifacts (SpriteLab-Windows / SpriteLab-macOS).
+  *Note: Signed-in GitHub users can access artifacts. For public releases, check the [Releases](https://github.com/GreenJoson/Spritelab/releases) page.*
+
+### Project Structure (Monorepo)
+```
+SpriteLab/
+├── apps/
+│   ├── web/          # Frontend (React + Vite + shadcn/ui) [WIP]
+│   └── api/          # Backend (Python + FastAPI) ✅
+├── packages/
+│   └── shared/       # Shared types ✅
+└── docs/             # Documentation
+```
+
+### Features
+- **Asset Generation**: Backgrounds, characters/NPCs, UI buttons, icons, animations, 9-slice borders, items.
+- **Customization**: Portrait/Landscape/Square orientations; Pixel art, hand-drawn, realistic, cartoon, low poly, isometric styles.
+- **Sprite Splitter**:
+  - **Grid Mode**: Split by fixed grid.
+  - **Rectangular Mode**: Smart detection of sprite boundaries via transparency.
+  - **Data File Mode**: Support for TexturePacker JSON export.
+
+### Quickstart (Local Development)
+#### One-liner
+```bash
+./start.sh
+```
+- **Frontend**: http://localhost:5173
+- **API Docs**: http://localhost:3000/docs
+
+#### Manual Setup
+```bash
+# Install dependencies
+pnpm install
+cd apps/api && pip install -r requirements.txt
+
+# Configure Environment (apps/api/.env)
+ZENMUX_API_KEY=sk-ai-v1-your-key-here
+ZENMUX_BASE_URL=https://zenmux.ai/api/vertex-ai
+REDIS_URL=redis://localhost:6379
+```
+
+### Tech Stack
+- **Backend**: FastAPI, Google Generative AI (Gemini via ZenMux), Celery + Redis, Pillow.
+- **Frontend**: React 18, Vite, shadcn/ui, TailwindCSS, Pixi.js, Zustand.
+- **Desktop**: Python 3.13, Tkinter, PyInstaller.
+
+### Roadmap
+- **Frontend**: Pixi.js preview/editing, sprite sheet packer, animation frames.
+- **Backend**: Multi-engine export (Godot/Unity/Cocos), WebSocket realtime updates.
+- **Production**: Docker Compose, Nginx setup.
+
+### Contributing
+PRs and issues are welcome! Please follow [Conventional Commits](https://www.conventionalcommits.org/).
+
+### License
+MIT
+
+---
+
+## 简体中文
+
+SpriteLab 是一个为游戏开发者打造的强大工具集，涵盖了 AI 素材生成和高性能精灵表（Sprite Sheet）切割功能。
+
+### 主要组件
+- **SpriteLab Web**: AI 生成平台（基于 FastAPI + Celery + Redis + React）。
+- **SpriteLab Tool**: 桌面端精灵表拆分器（基于 Python + Tkinter），用于离线素材处理。
+
+### 仓库与下载
+- **代码库**: [GitHub Repository](https://github.com/GreenJoson/Spritelab)
+- **持续集成**: GitHub Actions → **Build SpriteLab** 工作流 → 产物 (SpriteLab-Windows / SpriteLab-macOS)。
+  *注意：登录 GitHub 后即可在 Actions 页面下载产物。公共下载请关注 [Releases](https://github.com/GreenJoson/Spritelab/releases) 页面。*
+
+### 项目结构
+```
+SpriteLab/
+├── apps/
+│   ├── web/          # 前端 (React + Vite + shadcn/ui) [开发中]
+│   └── api/          # 后端 (Python + FastAPI) ✅
+├── packages/
+│   └── shared/       # 共享类型定义 ✅
+└── docs/             # 项目文档
+```
+
+### 功能特性
+- **素材生成**: 背景、角色/NPC、UI 按钮、图标、动画帧、九宫格边框、道具。
+- **自定义选项**: 支持横屏/竖屏/正方形；提供像素风、手绘、写实、卡通、低多边形、等距视角等多种风格。
+- **精灵表拆分**:
+  - **网格模式**: 按固定行列拆分。
+  - **矩形模式**: 通过透明度自动识别精灵边界。
+  - **数据文件模式**: 支持 TexturePacker JSON 格式。
+
+### 快速开始 (本地开发)
+#### 一键启动
+```bash
+./start.sh
+```
+- **前端地址**: http://localhost:5173
+- **API 文档**: http://localhost:3000/docs
+
+### 技术栈
+- **后端**: FastAPI, Google Gemini (通过 ZenMux), Celery + Redis, Pillow.
+- **前端**: React 18, Vite, shadcn/ui, TailwindCSS, Pixi.js, Zustand.
+- **桌面端**: Python 3.13, Tkinter, PyInstaller.
+
+### 路线图
+- **前端增强**: Pixi.js 预览编辑、精灵表打包、动画帧预览。
+- **后端增强**: 多引擎导出支持 (Godot/Unity/Cocos), WebSocket 实时更新。
+- **部署**: Docker Compose 支持, Nginx 配置优化。
+
+### 参与贡献
+欢迎提交 PR 或 Issue！请遵循 [约定式提交 (Conventional Commits)](https://www.conventionalcommits.org/zh-hans/) 规范。
+
+### 开源协议
+MIT
