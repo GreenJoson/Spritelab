@@ -9,3 +9,4 @@
 | i18n.py | 基础 | 多语言文案管理 |
 | README.md | 文档 | 使用说明与功能概览 |
 | tests/test_restore_mode.py | 测试 | Data File 还原尺寸回归测试 |
+| tests/test_name_template.py | 测试 | 空模板命名回退测试 |

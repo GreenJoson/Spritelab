@@ -554,6 +554,9 @@ class SpriteSplitter:
             smart_edge_active = False
             remove_bg_active = False
 
+        if not name_template.strip():
+            name_template = "{name}"
+
         for index, sprite in enumerate(self.sprites):
             # 裁剪精灵区域
             sprite_img = self.image.crop((
