@@ -14,7 +14,7 @@
 LANGUAGES = {
     "zh": {
         # 窗口标题
-        "app_title": "SpriteLab v1.0.12 - 精灵表拆分器 | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.13 - 精灵表拆分器 | SpriteLab.app",
 
         # 菜单
         "menu_file": "文件",
@@ -168,7 +168,7 @@ LANGUAGES = {
         # 帮助
         "help_title": "使用说明",
         "about_title": "关于",
-        "opensource_hint": "免费版 v1.0.12 | SpriteLab.app",
+        "opensource_hint": "免费版 v1.0.13 | SpriteLab.app",
 
         # 预览提示
         "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
@@ -239,7 +239,7 @@ LANGUAGES = {
 
     "en": {
         # Window title
-        "app_title": "SpriteLab v1.0.12 - Sprite Sheet Splitter | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.13 - Sprite Sheet Splitter | SpriteLab.app",
 
         # Menu
         "menu_file": "File",
@@ -390,7 +390,7 @@ LANGUAGES = {
         # Help
         "help_title": "Usage Guide",
         "about_title": "About",
-        "opensource_hint": "Free Version v1.0.12 | SpriteLab.app",
+        "opensource_hint": "Free Version v1.0.13 | SpriteLab.app",
 
         # Preview hint
         "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",

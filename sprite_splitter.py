@@ -460,6 +460,56 @@ class SpriteSplitter:
                     has_restore_data = True
                 self.sprites.append(sprite)
 
+        # 尝试解析 res/mc 格式（部分引擎导出的动画精灵表）
+        elif isinstance(data.get('res'), dict):
+            res_map = data.get('res', {})
+            mc_map = data.get('mc') if isinstance(data.get('mc'), dict) else None
+
+            if mc_map:
+                for mc_name, mc_data in mc_map.items():
+                    frames = mc_data.get('frames', []) if isinstance(mc_data, dict) else []
+                    if not isinstance(frames, list):
+                        continue
+                    for index, frame in enumerate(frames):
+                        if not isinstance(frame, dict):
+                            continue
+                        res_id = frame.get('res')
+                        rect = res_map.get(res_id) if res_id else None
+                        if not isinstance(rect, dict):
+                            continue
+                        x = self._safe_int(rect.get('x', 0))
+                        y = self._safe_int(rect.get('y', 0))
+                        width = self._safe_int(rect.get('w', rect.get('width', 0)))
+                        height = self._safe_int(rect.get('h', rect.get('height', 0)))
+                        off_x = self._safe_int(frame.get('x', 0))
+                        off_y = self._safe_int(frame.get('y', 0))
+                        sprite = SpriteRect(
+                            x=x,
+                            y=y,
+                            width=width,
+                            height=height,
+                            name=f"{mc_name}_{index}",
+                            off_x=off_x,
+                            off_y=off_y
+                        )
+                        self.sprites.append(sprite)
+            else:
+                for res_id, rect in res_map.items():
+                    if not isinstance(rect, dict):
+                        continue
+                    x = self._safe_int(rect.get('x', 0))
+                    y = self._safe_int(rect.get('y', 0))
+                    width = self._safe_int(rect.get('w', rect.get('width', 0)))
+                    height = self._safe_int(rect.get('h', rect.get('height', 0)))
+                    sprite = SpriteRect(
+                        x=x,
+                        y=y,
+                        width=width,
+                        height=height,
+                        name=str(res_id)
+                    )
+                    self.sprites.append(sprite)
+
         else:
             raise ValueError("不支持的JSON格式")
 
