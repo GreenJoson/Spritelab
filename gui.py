@@ -2,7 +2,7 @@
 """
 @input  依赖：tkinter, SpriteSplitter
 @output 导出：SpriteSplitterGUI
-@pos    图形界面入口与交互逻辑
+@pos    图形界面入口与交互逻辑（数据文件切换自动刷新）
 
 ⚠️ 一旦本文件被更新，务必更新以上注释
 
@@ -678,13 +678,13 @@ class SpriteSheetSplitterGUI:
             ]
         )
         if file_path:
+            self.clear_all()
             self.data_file_var.set(file_path)
             self.split_mode.set("data")
             self.on_mode_change()
-            if not self.image_path:
-                image_path = resolve_image_path_from_data_file(file_path)
-                if image_path:
-                    self.load_image(image_path)
+            image_path = resolve_image_path_from_data_file(file_path)
+            if image_path:
+                self.load_image(image_path)
 
     def browse_data_file(self):
         """浏览数据文件"""
