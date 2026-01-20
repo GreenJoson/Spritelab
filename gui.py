@@ -447,12 +447,14 @@ class SpriteSheetSplitterGUI:
         self.trim_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(out_row5, text=i18n.t("trim_transparent"), variable=self.trim_var).pack(side=tk.LEFT)
 
+        out_row5b = ttk.Frame(output_frame)
+        out_row5b.pack(fill=tk.X, pady=2)
         self.restore_source_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(out_row5, text=i18n.t("restore_source"), variable=self.restore_source_var).pack(side=tk.LEFT, padx=5)
-        ttk.Label(out_row5, text=i18n.t("offset_origin")).pack(side=tk.LEFT, padx=5)
+        ttk.Checkbutton(out_row5b, text=i18n.t("restore_source"), variable=self.restore_source_var).pack(side=tk.LEFT)
+        ttk.Label(out_row5b, text=i18n.t("offset_origin")).pack(side=tk.LEFT, padx=8)
         self.offset_origin_var = tk.StringVar(value=i18n.t("offset_origin_top"))
         origin_combo = ttk.Combobox(
-            out_row5,
+            out_row5b,
             textvariable=self.offset_origin_var,
             values=[i18n.t("offset_origin_top"), i18n.t("offset_origin_bottom")],
             width=8,
