@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+@input  依赖：LANGUAGES 字典
+@output 导出：i18n 文案查找
+@pos    全局文案与多语言入口
+
+⚠️ 一旦本文件被更新，务必更新以上注释
+
 多语言支持模块
 支持中文和英文
 """
@@ -8,7 +14,7 @@
 LANGUAGES = {
     "zh": {
         # 窗口标题
-        "app_title": "SpriteLab v1.0.7 - 精灵表拆分器 | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.10 - 精灵表拆分器 | SpriteLab.app",
 
         # 菜单
         "menu_file": "文件",
@@ -79,6 +85,10 @@ LANGUAGES = {
         "template_help": "可用: {name} {index} {x} {y} {width} {height}  例: light_{index}",
         "format": "格式:",
         "trim_transparent": "裁剪透明边缘",
+        "restore_source": "还原原始尺寸",
+        "offset_origin": "偏移原点",
+        "offset_origin_top": "左上",
+        "offset_origin_bottom": "左下",
         "edge_crop": "边缘裁剪:",
         "edge_crop_hint": "(去除边缘分隔线)",
         "smart_edge": "智能边缘检测",
@@ -104,8 +114,18 @@ LANGUAGES = {
         "status_loaded": "已加载: {filename}",
         "status_split_done": "拆分完成，共 {count} 个精灵",
         "status_saved": "已保存 {count} 个精灵到 {path}",
+        "status_loaded": "已加载: {name}",
+        "status_clipboard_loaded": "已从剪贴板加载: {name}",
+        "status_split_complete": "拆分完成，共 {count} 个精灵",
+        "status_saved_to": "已保存 {count} 个精灵到 {path}",
         "status_deleted": "已删除精灵，剩余 {count} 个",
+        "status_deleted_all": "已删除全部精灵",
         "status_renumbered": "已重新编号 {count} 个精灵",
+        "status_exported": "数据文件已导出: {path}",
+        "status_selected": "选中: {name} - 位置({x}, {y}) 尺寸({w}x{h})",
+        "sprite_count_total": "共 {count} 个精灵",
+        "sprite_count_preview": "预览: {count} 个精灵",
+        "size_info": "{w} x {h}, {count} 个精灵",
 
         # 对话框
         "warning": "警告",
@@ -114,24 +134,41 @@ LANGUAGES = {
         "confirm": "确认",
         "info": "提示",
 
+        # 消息标题
+        "title_warning": "警告",
+        "title_info": "提示",
+        "title_error": "错误",
+        "title_success": "成功",
+        "title_confirm": "确认",
+        "title_complete": "完成",
+
+        # 详细消息
+        "msg_clipboard_not_image": "剪贴板中的文件不是支持的图片格式",
+        "msg_clipboard_help": "请复制图片文件的完整路径，或直接使用'打开图片'按钮",
+        "msg_clipboard_empty": "剪贴板为空或不包含文件路径\n\n请复制图片文件的完整路径",
+        "msg_paste_failed": "粘贴失败: {error}",
+        "msg_load_failed": "加载图片失败: {error}",
+        "msg_split_failed": "拆分失败: {error}",
+        "msg_save_failed": "保存失败: {error}",
+        "msg_export_failed": "导出失败: {error}",
+        "msg_template_applied": "已应用名称模板到 {count} 个精灵",
+        "msg_select_data_first": "请选择数据文件",
+
         # 消息
-        "msg_load_image": "请先加载图片",
         "msg_load_image": "请先加载图片",
         "msg_do_split": "请先执行拆分操作",
         "err_no_image": "请加载图片",
         "err_no_sprites": "请先执行拆分",
+        "msg_select_sprite": "请先选中要删除的精灵",
         "msg_no_sprites": "没有精灵需要编号",
         "msg_delete_all": "确定要删除全部精灵吗？",
         "msg_save_success": "已保存 {count} 个精灵到:\n{path}",
-        "msg_template_applied": "已应用名称模板到 {count} 个精灵",
-        "msg_clipboard_empty": "剪贴板为空或不包含文件路径\n\n请复制图片文件的完整路径",
-        "msg_paste_hint": "请复制图片文件的完整路径，或直接使用'打开图片'按钮",
-        "msg_wrong_format": "剪贴板中的文件不是支持的图片格式",
+        "msg_select_data": "请选择数据文件",
 
         # 帮助
         "help_title": "使用说明",
         "about_title": "关于",
-        "opensource_hint": "免费版 v1.0.7 | SpriteLab.app",
+        "opensource_hint": "免费版 v1.0.10 | SpriteLab.app",
 
         # 预览提示
         "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
@@ -202,7 +239,7 @@ LANGUAGES = {
 
     "en": {
         # Window title
-        "app_title": "SpriteLab v1.0.7 - Sprite Sheet Splitter | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.10 - Sprite Sheet Splitter | SpriteLab.app",
 
         # Menu
         "menu_file": "File",
@@ -273,6 +310,10 @@ LANGUAGES = {
         "template_help": "Variables: {name} {index} {x} {y} {width} {height}  e.g. sprite_{index}",
         "format": "Format:",
         "trim_transparent": "Trim Transparent",
+        "restore_source": "Restore Source Size",
+        "offset_origin": "Offset Origin",
+        "offset_origin_top": "Top-Left",
+        "offset_origin_bottom": "Bottom-Left",
         "edge_crop": "Edge Crop:",
         "edge_crop_hint": "(Remove border lines)",
         "smart_edge": "Smart Edge Detection",
@@ -293,13 +334,20 @@ LANGUAGES = {
         "target_height": "Height:",
         "keep_ratio": "Keep Aspect Ratio",
 
-        # Status bar
+        # Status Bar
         "status_ready": "Ready",
-        "status_loaded": "Loaded: {filename}",
-        "status_split_done": "Split complete, {count} sprites",
-        "status_saved": "Saved {count} sprites to {path}",
-        "status_deleted": "Deleted sprite, {count} remaining",
+        "status_loaded": "Loaded: {name}",
+        "status_clipboard_loaded": "Loaded from clipboard: {name}",
+        "status_split_complete": "Split complete, {count} sprites found",
+        "status_saved_to": "Saved {count} sprites to {path}",
+        "status_deleted": "Sprite deleted, {count} remaining",
+        "status_deleted_all": "Deleted all sprites",
         "status_renumbered": "Renumbered {count} sprites",
+        "status_exported": "Data file exported: {path}",
+        "status_selected": "Selected: {name} - Pos({x}, {y}) Size({w}x{h})",
+        "sprite_count_total": "{count} sprites in total",
+        "sprite_count_preview": "Preview: {count} sprites",
+        "size_info": "{w} x {h}, {count} sprites",
 
         # Dialogs
         "warning": "Warning",
@@ -308,25 +356,41 @@ LANGUAGES = {
         "confirm": "Confirm",
         "info": "Info",
 
+        # Message titles
+        "title_warning": "Warning",
+        "title_info": "Information",
+        "title_error": "Error",
+        "title_success": "Success",
+        "title_confirm": "Confirm",
+        "title_complete": "Complete",
+
+        # Detailed messages
+        "msg_clipboard_not_image": "The file in clipboard is not a supported image format",
+        "msg_clipboard_help": "Please copy the full path of the image file, or use 'Open Image' button",
+        "msg_clipboard_empty": "Clipboard is empty or does not contain a file path\n\nPlease copy the full path",
+        "msg_paste_failed": "Paste failed: {error}",
+        "msg_load_failed": "Load image failed: {error}",
+        "msg_split_failed": "Split failed: {error}",
+        "msg_save_failed": "Save failed: {error}",
+        "msg_export_failed": "Export failed: {error}",
+        "msg_template_applied": "Applied name template to {count} sprites",
+        "msg_select_data_first": "Please select a data file first",
+
         # Messages
-        "msg_load_image": "Please load an image first",
         "msg_load_image": "Please load an image first",
         "msg_do_split": "Please split the image first",
         "err_no_image": "Please load an image",
         "err_no_sprites": "Please split first",
         "msg_select_data": "Please select a data file",
+        "msg_select_sprite": "Please select a sprite to delete",
         "msg_no_sprites": "No sprites to renumber",
         "msg_delete_all": "Delete all sprites?",
         "msg_save_success": "Saved {count} sprites to:\n{path}",
-        "msg_template_applied": "Applied name template to {count} sprites",
-        "msg_clipboard_empty": "Clipboard is empty or does not contain a file path\n\nPlease copy the full path of an image file",
-        "msg_paste_hint": "Please copy the full path of an image file, or use the 'Open Image' button",
-        "msg_wrong_format": "The file in clipboard is not a supported image format",
 
         # Help
         "help_title": "Usage Guide",
         "about_title": "About",
-        "opensource_hint": "Free Version v1.0.7 | SpriteLab.app",
+        "opensource_hint": "Free Version v1.0.10 | SpriteLab.app",
 
         # Preview hint
         "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",

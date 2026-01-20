@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+@input  依赖：Pillow, i18n
+@output 导出：SpriteSplitter, SpriteRect
+@pos    精灵表拆分的核心逻辑
+
+⚠️ 一旦本文件被更新，务必更新以上注释
+
 精灵表拆分器 (Sprite Sheet Splitter)
 模仿TexturePacker的功能实现的简易版本
 
@@ -22,6 +28,39 @@ from typing import List, Tuple, Optional, Dict
 from pathlib import Path
 
 
+def resolve_image_path_from_data_file(data_path: str) -> Optional[str]:
+    """根据JSON数据文件尝试解析对应的精灵表图片路径"""
+    if not os.path.exists(data_path):
+        return None
+
+    try:
+        with open(data_path, 'r', encoding='utf-8') as handle:
+            data = json.load(handle)
+    except Exception:
+        return None
+
+    file_name = data.get("file")
+    if not file_name:
+        meta = data.get("meta", {}) if isinstance(data.get("meta"), dict) else {}
+        file_name = meta.get("image") or meta.get("imagePath")
+
+    if not file_name:
+        return None
+
+    data_dir = Path(data_path).parent
+    candidate = Path(file_name)
+    if not candidate.is_absolute():
+        candidate = data_dir / candidate
+
+    if candidate.exists():
+        return str(candidate)
+
+    if Path(file_name).exists():
+        return str(Path(file_name))
+
+    return None
+
+
 @dataclass
 class SpriteRect:
     """精灵矩形区域"""
@@ -30,6 +69,10 @@ class SpriteRect:
     width: int
     height: int
     name: str = ""
+    off_x: int = 0
+    off_y: int = 0
+    source_w: int = 0
+    source_h: int = 0
 
 
 class SpriteSplitter:
@@ -45,6 +88,8 @@ class SpriteSplitter:
         self.image_path = image_path
         self.image: Optional[Image.Image] = None
         self.sprites: List[SpriteRect] = []
+        self.restore_source = False
+        self.offset_origin = "top"
         self._load_image()
 
     def _load_image(self):
@@ -60,6 +105,30 @@ class SpriteSplitter:
         print(f"✓ 已加载图片: {self.image_path}")
         print(f"  尺寸: {self.image.width} x {self.image.height}")
         print(f"  模式: {self.image.mode}")
+
+    @staticmethod
+    def _safe_int(value, default: int = 0) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
+
+    def _extract_frame_data(self, frame_data: Dict) -> Tuple[int, int, int, int, int, int, int, int]:
+        frame = frame_data.get('frame', frame_data)
+        x = self._safe_int(frame.get('x', 0))
+        y = self._safe_int(frame.get('y', 0))
+        width = self._safe_int(frame.get('w', frame.get('width', 0)))
+        height = self._safe_int(frame.get('h', frame.get('height', 0)))
+
+        sprite_source = frame_data.get('spriteSourceSize') if isinstance(frame_data.get('spriteSourceSize'), dict) else {}
+        off_x = self._safe_int(sprite_source.get('x', frame_data.get('offX', frame_data.get('offsetX', 0))))
+        off_y = self._safe_int(sprite_source.get('y', frame_data.get('offY', frame_data.get('offsetY', 0))))
+
+        source_size = frame_data.get('sourceSize') if isinstance(frame_data.get('sourceSize'), dict) else {}
+        source_w = self._safe_int(source_size.get('w', source_size.get('width', frame_data.get('sourceW', frame_data.get('sourceWidth', 0)))))
+        source_h = self._safe_int(source_size.get('h', source_size.get('height', frame_data.get('sourceH', frame_data.get('sourceHeight', 0)))))
+
+        return x, y, width, height, off_x, off_y, source_w, source_h
 
     def split_by_grid(
         self,
@@ -89,6 +158,7 @@ class SpriteSplitter:
         if not self.image:
             raise ValueError("请先加载图片")
 
+        self.restore_source = False
         img_width = self.image.width
         img_height = self.image.height
 
@@ -156,6 +226,7 @@ class SpriteSplitter:
         if not self.image:
             raise ValueError("请先加载图片")
 
+        self.restore_source = False
         print(f"\n🔍 Rectangular模式拆分:")
         print(f"  最小尺寸: {min_width} x {min_height}")
         print(f"  Alpha阈值: {alpha_threshold}")
@@ -317,6 +388,7 @@ class SpriteSplitter:
             data = json.load(f)
 
         self.sprites = []
+        has_restore_data = False
 
         # 尝试解析TexturePacker格式
         if 'frames' in data:
@@ -325,47 +397,91 @@ class SpriteSplitter:
             # TexturePacker hash格式
             if isinstance(frames, dict):
                 for name, frame_data in frames.items():
-                    frame = frame_data.get('frame', frame_data)
+                    x, y, width, height, off_x, off_y, source_w, source_h = self._extract_frame_data(frame_data)
                     sprite = SpriteRect(
-                        x=frame.get('x', 0),
-                        y=frame.get('y', 0),
-                        width=frame.get('w', frame.get('width', 0)),
-                        height=frame.get('h', frame.get('height', 0)),
-                        name=name
+                        x=x,
+                        y=y,
+                        width=width,
+                        height=height,
+                        name=name,
+                        off_x=off_x,
+                        off_y=off_y,
+                        source_w=source_w,
+                        source_h=source_h
                     )
+                    if source_w > 0 and source_h > 0:
+                        has_restore_data = True
                     self.sprites.append(sprite)
 
             # TexturePacker array格式
             elif isinstance(frames, list):
                 for frame_data in frames:
-                    frame = frame_data.get('frame', frame_data)
                     name = frame_data.get('filename', frame_data.get('name', ''))
+                    x, y, width, height, off_x, off_y, source_w, source_h = self._extract_frame_data(frame_data)
                     sprite = SpriteRect(
-                        x=frame.get('x', 0),
-                        y=frame.get('y', 0),
-                        width=frame.get('w', frame.get('width', 0)),
-                        height=frame.get('h', frame.get('height', 0)),
-                        name=name
+                        x=x,
+                        y=y,
+                        width=width,
+                        height=height,
+                        name=name,
+                        off_x=off_x,
+                        off_y=off_y,
+                        source_w=source_w,
+                        source_h=source_h
                     )
+                    if source_w > 0 and source_h > 0:
+                        has_restore_data = True
                     self.sprites.append(sprite)
 
         # 尝试解析简单的sprites数组格式
         elif 'sprites' in data:
             for sprite_data in data['sprites']:
+                x = self._safe_int(sprite_data.get('x', 0))
+                y = self._safe_int(sprite_data.get('y', 0))
+                width = self._safe_int(sprite_data.get('width', sprite_data.get('w', 0)))
+                height = self._safe_int(sprite_data.get('height', sprite_data.get('h', 0)))
+                off_x = self._safe_int(sprite_data.get('offX', sprite_data.get('offsetX', 0)))
+                off_y = self._safe_int(sprite_data.get('offY', sprite_data.get('offsetY', 0)))
+                source_w = self._safe_int(sprite_data.get('sourceW', sprite_data.get('sourceWidth', 0)))
+                source_h = self._safe_int(sprite_data.get('sourceH', sprite_data.get('sourceHeight', 0)))
+
                 sprite = SpriteRect(
-                    x=sprite_data.get('x', 0),
-                    y=sprite_data.get('y', 0),
-                    width=sprite_data.get('width', sprite_data.get('w', 0)),
-                    height=sprite_data.get('height', sprite_data.get('h', 0)),
-                    name=sprite_data.get('name', '')
+                    x=x,
+                    y=y,
+                    width=width,
+                    height=height,
+                    name=sprite_data.get('name', ''),
+                    off_x=off_x,
+                    off_y=off_y,
+                    source_w=source_w,
+                    source_h=source_h
                 )
+                if source_w > 0 and source_h > 0:
+                    has_restore_data = True
                 self.sprites.append(sprite)
 
         else:
             raise ValueError("不支持的JSON格式")
 
+        self.restore_source = has_restore_data
+
         print(f"  共解析到 {len(self.sprites)} 个精灵")
         return self.sprites
+
+    def _restore_sprite(self, sprite_img: Image.Image, sprite: SpriteRect, origin_mode: str) -> Image.Image:
+        if sprite.source_w <= 0 or sprite.source_h <= 0:
+            return sprite_img
+
+        canvas = Image.new("RGBA", (sprite.source_w, sprite.source_h), (0, 0, 0, 0))
+        offset_x = max(0, sprite.off_x)
+
+        if origin_mode == "bottom":
+            offset_y = max(0, sprite.source_h - sprite.off_y - sprite.height)
+        else:
+            offset_y = max(0, sprite.off_y)
+
+        canvas.paste(sprite_img, (offset_x, offset_y), sprite_img)
+        return canvas
 
     def save_sprites(
         self,
@@ -379,7 +495,9 @@ class SpriteSplitter:
         resize_mode: str = "none",
         resize_scale: float = 1.0,
         resize_width: int = 0,
-        resize_height: int = 0
+        resize_height: int = 0,
+        restore_source: Optional[bool] = None,
+        offset_origin: Optional[str] = None
     ) -> List[str]:
         """
         保存拆分后的精灵图片
@@ -396,6 +514,8 @@ class SpriteSplitter:
             resize_scale: 缩放比例 (当resize_mode为"scale"时使用)
             resize_width: 目标宽度 (当resize_mode为"width"或"custom"时使用)
             resize_height: 目标高度 (当resize_mode为"height"或"custom"时使用)
+            restore_source: 是否还原原始尺寸（offX/offY/sourceW/sourceH）
+            offset_origin: 偏移原点（"top" 或 "bottom"）
 
         Returns:
             保存的文件路径列表
@@ -416,8 +536,23 @@ class SpriteSplitter:
         print(f"  裁剪透明边缘: {trim}")
         print(f"  边缘裁剪: {edge_crop}px")
         print(f"  智能边缘检测: {smart_edge_detect}")
+        print(f"  还原原始尺寸: {self.restore_source if restore_source is None else restore_source}")
 
         saved_files = []
+        restore_active = self.restore_source if restore_source is None else restore_source
+        origin_mode = (offset_origin or self.offset_origin or "top").lower()
+
+        trim_active = trim
+        edge_crop_active = edge_crop
+        smart_edge_active = smart_edge_detect
+        remove_bg_active = remove_bg
+
+        if restore_active and (trim or edge_crop > 0 or smart_edge_detect or remove_bg):
+            print("  ⚠️ 还原原始尺寸已开启，已忽略裁剪/去背景相关参数")
+            trim_active = False
+            edge_crop_active = 0
+            smart_edge_active = False
+            remove_bg_active = False
 
         for index, sprite in enumerate(self.sprites):
             # 裁剪精灵区域
@@ -429,28 +564,32 @@ class SpriteSplitter:
             ))
 
             # 边缘裁剪（方案2）- 固定像素数裁剪
-            if edge_crop > 0:
+            if edge_crop_active > 0:
                 w, h = sprite_img.size
-                left = min(edge_crop, w // 2)
-                top = min(edge_crop, h // 2)
-                right = max(0, w - edge_crop)
-                bottom = max(0, h - edge_crop)
+                left = min(edge_crop_active, w // 2)
+                top = min(edge_crop_active, h // 2)
+                right = max(0, w - edge_crop_active)
+                bottom = max(0, h - edge_crop_active)
                 if right > left and bottom > top:
                     sprite_img = sprite_img.crop((left, top, right, bottom))
 
             # 智能边缘检测（方案3）- 自动检测并移除边缘纯色分隔线
-            if smart_edge_detect:
+            if smart_edge_active:
                 sprite_img = self._smart_crop_edges(sprite_img)
 
             # 智能去除边缘背景 - 从边缘开始去除纯色背景
-            if remove_bg:
+            if remove_bg_active:
                 sprite_img = self._remove_edge_background(sprite_img)
 
             # 裁剪透明边缘
-            if trim:
+            if trim_active:
                 bbox = sprite_img.getbbox()
                 if bbox:
                     sprite_img = sprite_img.crop(bbox)
+
+            # 还原原始尺寸（基于offX/offY/sourceW/sourceH）
+            if restore_active and sprite.source_w > 0 and sprite.source_h > 0:
+                sprite_img = self._restore_sprite(sprite_img, sprite, origin_mode)
 
             # 批量调整大小
             if resize_mode != "none" and sprite_img.size[0] > 0 and sprite_img.size[1] > 0:
@@ -856,7 +995,7 @@ def main():
         '''
     )
 
-    parser.add_argument('image', help='精灵表图片路径')
+    parser.add_argument('image', nargs='?', help='精灵表图片路径 (data模式可省略)')
     parser.add_argument('-m', '--mode', choices=['grid', 'rect', 'data'], default='grid',
                         help='拆分模式: grid(网格), rect(矩形检测), data(数据文件)')
     parser.add_argument('-o', '--output', default='./output', help='输出目录')
@@ -880,12 +1019,30 @@ def main():
 
     # Data File模式参数
     parser.add_argument('-d', '--data-file', help='Data模式: JSON数据文件路径')
+    parser.add_argument('--restore-source', action='store_true', help='还原原始尺寸 (offX/offY/sourceW/sourceH)')
+    parser.add_argument('--offset-origin', choices=['top', 'bottom'], default='top', help='偏移原点: top(左上), bottom(左下)')
 
     args = parser.parse_args()
 
     try:
+        image_path = args.image
+        if args.mode == 'data':
+            if not args.data_file:
+                print("错误: Data模式需要指定 -d/--data-file 参数")
+                return 1
+            if not image_path:
+                image_path = resolve_image_path_from_data_file(args.data_file)
+                if not image_path:
+                    print("错误: Data模式需要图片路径或JSON包含file/meta.image")
+                    return 1
+
+        if not image_path:
+            print("错误: 请指定图片路径")
+            return 1
+
         # 创建拆分器
-        splitter = SpriteSplitter(args.image)
+        splitter = SpriteSplitter(image_path)
+        splitter.offset_origin = args.offset_origin
 
         # 执行拆分
         if args.mode == 'grid':
@@ -904,10 +1061,9 @@ def main():
                 alpha_threshold=args.alpha_threshold
             )
         elif args.mode == 'data':
-            if not args.data_file:
-                print("错误: Data模式需要指定 -d/--data-file 参数")
-                return 1
             splitter.split_by_data_file(args.data_file)
+            if args.restore_source:
+                splitter.restore_source = True
 
         # 生成预览
         if args.preview:

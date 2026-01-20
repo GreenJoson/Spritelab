@@ -19,7 +19,7 @@ A powerful desktop tool to split sprite sheets (Texture Atlases) using multiple 
 ### Key Features
 - **Grid Mode**: Split by fixed columns/rows or pixel dimensions.
 - **Rectangular Mode**: Smart boundary detection using alpha transparency or background color.
-- **Data File Mode**: Import and split via JSON data files (TexturePacker format).
+- **Data File Mode**: Import and split via JSON data files (TexturePacker format), supports offX/offY/sourceW/sourceH restore and JSON-based image auto-resolve.
 - **Internationalization**: Full support for English and Chinese.
 - **Real-time Preview**: Precise visual feedback before exporting.
 - **Batch Processing**: Smart edge trimming, background removal, and asset renaming.
@@ -58,7 +58,7 @@ SpriteLab Splitter 是一款高性能的桌面端工具，专门为游戏开发�
 ### 核心功能
 - **网格模式**: 按固定的行列或像素尺寸进行拆分。
 - **矩形模式**: 通过透明度或背景色智能识别精灵边界。
-- **数据文件模式**: 支持导入 JSON 数据文件（如 TexturePacker 格式）进行拆分。
+- **数据文件模式**: 支持导入 JSON 数据文件（如 TexturePacker 格式）进行拆分，支持 offX/offY/sourceW/sourceH 还原原始尺寸，并可自动解析 JSON 中的图片路径。
 - **多语言支持**: 完美支持中文和英文。
 - **实时预览**: 导出前提供精确的视觉反馈。
 - **批量处理**: 支持智能边缘裁剪、去背景和资产重命名。

@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+@input  依赖：tkinter, SpriteSplitter
+@output 导出：SpriteSplitterGUI
+@pos    图形界面入口与交互逻辑
+
+⚠️ 一旦本文件被更新，务必更新以上注释
+
 精灵表拆分器 GUI版本
 使用tkinter实现图形界面，模仿TexturePacker的操作体验
 
@@ -20,7 +26,7 @@ import threading
 from pathlib import Path
 
 # 导入核心拆分器
-from sprite_splitter import SpriteSplitter, SpriteRect
+from sprite_splitter import SpriteSplitter, SpriteRect, resolve_image_path_from_data_file
 
 # 导入多语言支持
 # 导入多语言支持
@@ -317,7 +323,7 @@ class SpriteSheetSplitterGUI:
         # 列数和行数
         grid_row1 = ttk.Frame(self.grid_frame)
         grid_row1.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row1, text="Columns:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row1, text=i18n.t("grid_columns"), width=12).pack(side=tk.LEFT)
         self.columns_var = tk.StringVar(value="1")
         self.columns_var.trace_add("write", self.on_grid_param_change)
         columns_spinbox = ttk.Spinbox(grid_row1, from_=1, to=100, textvariable=self.columns_var, width=8)
@@ -325,7 +331,7 @@ class SpriteSheetSplitterGUI:
 
         grid_row2 = ttk.Frame(self.grid_frame)
         grid_row2.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row2, text="Rows:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row2, text=i18n.t("grid_rows"), width=12).pack(side=tk.LEFT)
         self.rows_var = tk.StringVar(value="1")
         self.rows_var.trace_add("write", self.on_grid_param_change)
         rows_spinbox = ttk.Spinbox(grid_row2, from_=1, to=100, textvariable=self.rows_var, width=8)
@@ -334,7 +340,7 @@ class SpriteSheetSplitterGUI:
         # 精灵尺寸
         grid_row3 = ttk.Frame(self.grid_frame)
         grid_row3.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row3, text="精灵宽度:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row3, text=i18n.t("sprite_width"), width=12).pack(side=tk.LEFT)
         self.sprite_width_var = tk.StringVar(value="0")
         self.sprite_width_var.trace_add("write", self.on_grid_param_change)
         sprite_width_spinbox = ttk.Spinbox(grid_row3, from_=0, to=9999, textvariable=self.sprite_width_var, width=8)
@@ -342,7 +348,7 @@ class SpriteSheetSplitterGUI:
 
         grid_row4 = ttk.Frame(self.grid_frame)
         grid_row4.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row4, text="精灵高度:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row4, text=i18n.t("sprite_height"), width=12).pack(side=tk.LEFT)
         self.sprite_height_var = tk.StringVar(value="0")
         self.sprite_height_var.trace_add("write", self.on_grid_param_change)
         sprite_height_spinbox = ttk.Spinbox(grid_row4, from_=0, to=9999, textvariable=self.sprite_height_var, width=8)
@@ -351,7 +357,7 @@ class SpriteSheetSplitterGUI:
         # 间距设置
         grid_row5 = ttk.Frame(self.grid_frame)
         grid_row5.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row5, text="形状填充:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row5, text=i18n.t("padding"), width=12).pack(side=tk.LEFT)
         self.padding_var = tk.StringVar(value="0")
         self.padding_var.trace_add("write", self.on_grid_param_change)
         padding_spinbox = ttk.Spinbox(grid_row5, from_=0, to=100, textvariable=self.padding_var, width=8)
@@ -359,41 +365,41 @@ class SpriteSheetSplitterGUI:
 
         grid_row6 = ttk.Frame(self.grid_frame)
         grid_row6.pack(fill=tk.X, pady=2)
-        ttk.Label(grid_row6, text="边框填充:", width=12).pack(side=tk.LEFT)
+        ttk.Label(grid_row6, text=i18n.t("margin"), width=12).pack(side=tk.LEFT)
         self.margin_var = tk.StringVar(value="0")
         self.margin_var.trace_add("write", self.on_grid_param_change)
         margin_spinbox = ttk.Spinbox(grid_row6, from_=0, to=100, textvariable=self.margin_var, width=8)
         margin_spinbox.pack(side=tk.LEFT)
 
         # Rectangular模式设置（默认隐藏）
-        self.rect_frame = ttk.LabelFrame(splitter_frame, text="Rectangular设置", padding=5)
+        self.rect_frame = ttk.LabelFrame(splitter_frame, text=i18n.t("rect_settings"), padding=5)
 
         rect_row1 = ttk.Frame(self.rect_frame)
         rect_row1.pack(fill=tk.X, pady=2)
-        ttk.Label(rect_row1, text="最小宽度:", width=12).pack(side=tk.LEFT)
+        ttk.Label(rect_row1, text=i18n.t("min_width"), width=12).pack(side=tk.LEFT)
         self.min_width_var = tk.StringVar(value="1")
         ttk.Spinbox(rect_row1, from_=1, to=1000, textvariable=self.min_width_var, width=8).pack(side=tk.LEFT)
 
         rect_row2 = ttk.Frame(self.rect_frame)
         rect_row2.pack(fill=tk.X, pady=2)
-        ttk.Label(rect_row2, text="最小高度:", width=12).pack(side=tk.LEFT)
+        ttk.Label(rect_row2, text=i18n.t("min_height"), width=12).pack(side=tk.LEFT)
         self.min_height_var = tk.StringVar(value="1")
         ttk.Spinbox(rect_row2, from_=1, to=1000, textvariable=self.min_height_var, width=8).pack(side=tk.LEFT)
 
         rect_row3 = ttk.Frame(self.rect_frame)
         rect_row3.pack(fill=tk.X, pady=2)
-        ttk.Label(rect_row3, text="Alpha阈值:", width=12).pack(side=tk.LEFT)
+        ttk.Label(rect_row3, text=i18n.t("alpha_threshold"), width=12).pack(side=tk.LEFT)
         self.alpha_threshold_var = tk.StringVar(value="0")
         ttk.Spinbox(rect_row3, from_=0, to=255, textvariable=self.alpha_threshold_var, width=8).pack(side=tk.LEFT)
 
         # Data File模式设置（默认隐藏）
-        self.data_frame = ttk.LabelFrame(splitter_frame, text="数据文件设置", padding=5)
+        self.data_frame = ttk.LabelFrame(splitter_frame, text=i18n.t("data_settings"), padding=5)
 
         data_row1 = ttk.Frame(self.data_frame)
         data_row1.pack(fill=tk.X, pady=2)
         self.data_file_var = tk.StringVar(value="")
         ttk.Entry(data_row1, textvariable=self.data_file_var).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(data_row1, text="浏览", command=self.browse_data_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(data_row1, text=i18n.t("browse"), command=self.browse_data_file).pack(side=tk.LEFT, padx=2)
 
         # 输出设置
         output_frame = ttk.LabelFrame(splitter_frame, text=i18n.t("output_settings"), padding=5)
@@ -440,6 +446,19 @@ class SpriteSheetSplitterGUI:
 
         self.trim_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(out_row5, text=i18n.t("trim_transparent"), variable=self.trim_var).pack(side=tk.LEFT)
+
+        self.restore_source_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(out_row5, text=i18n.t("restore_source"), variable=self.restore_source_var).pack(side=tk.LEFT, padx=5)
+        ttk.Label(out_row5, text=i18n.t("offset_origin")).pack(side=tk.LEFT, padx=5)
+        self.offset_origin_var = tk.StringVar(value=i18n.t("offset_origin_top"))
+        origin_combo = ttk.Combobox(
+            out_row5,
+            textvariable=self.offset_origin_var,
+            values=[i18n.t("offset_origin_top"), i18n.t("offset_origin_bottom")],
+            width=8,
+            state="readonly"
+        )
+        origin_combo.pack(side=tk.LEFT)
 
         # 边缘裁剪设置
         out_row6 = ttk.Frame(output_frame)
@@ -534,7 +553,7 @@ class SpriteSheetSplitterGUI:
         status_frame = ttk.Frame(self.root)
         status_frame.pack(fill=tk.X, side=tk.BOTTOM)
 
-        self.status_label = ttk.Label(status_frame, text="就绪", anchor=tk.W)
+        self.status_label = ttk.Label(status_frame, text=i18n.t("status_ready"), anchor=tk.W)
         self.status_label.pack(side=tk.LEFT, padx=5)
 
         self.size_label = ttk.Label(status_frame, text="", anchor=tk.E)
@@ -612,20 +631,20 @@ class SpriteSheetSplitterGUI:
                 # 检查是否是图片格式
                 if file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')):
                     self.load_image(file_path)
-                    self.status_label.config(text=f"已从剪贴板加载: {os.path.basename(file_path)}")
+                    self.status_label.config(text=i18n.t("status_clipboard_loaded", name=os.path.basename(file_path)))
                 else:
-                    messagebox.showwarning("警告", "剪贴板中的文件不是支持的图片格式")
+                    messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_clipboard_not_image"))
             else:
                 # 尝试作为路径处理
                 if file_path and not file_path.startswith('/'):
                     # 可能是相对路径或其他内容
-                    messagebox.showinfo("提示", "请复制图片文件的完整路径，或直接使用'打开图片'按钮")
+                    messagebox.showinfo(i18n.t("title_info"), i18n.t("msg_clipboard_help"))
 
         except tk.TclError:
             # 剪贴板为空或不包含文本
-            messagebox.showinfo("提示", "剪贴板为空或不包含文件路径\n\n请复制图片文件的完整路径")
+            messagebox.showinfo(i18n.t("title_info"), i18n.t("msg_clipboard_empty"))
         except Exception as e:
-            messagebox.showerror("错误", f"粘贴失败: {e}")
+            messagebox.showerror(i18n.t("title_error"), i18n.t("msg_paste_failed", error=str(e)))
 
     def on_drop(self, event):
         """处理拖放事件"""
@@ -660,6 +679,10 @@ class SpriteSheetSplitterGUI:
             self.data_file_var.set(file_path)
             self.split_mode.set("data")
             self.on_mode_change()
+            if not self.image_path:
+                image_path = resolve_image_path_from_data_file(file_path)
+                if image_path:
+                    self.load_image(image_path)
 
     def browse_data_file(self):
         """浏览数据文件"""
@@ -685,7 +708,7 @@ class SpriteSheetSplitterGUI:
 
             # 清空精灵列表
             self.sprite_listbox.delete(0, tk.END)
-            self.sprite_count_label.config(text="共 0 个精灵")
+            self.sprite_count_label.config(text=i18n.t("sprite_count_total", count=0))
 
             # 获取图片尺寸
             w, h = self.original_image.size
@@ -706,7 +729,7 @@ class SpriteSheetSplitterGUI:
             self.sprite_height_var.set(str(sprite_h))
 
             # 更新状态栏
-            self.status_label.config(text=f"已加载: {os.path.basename(file_path)}")
+            self.status_label.config(text=i18n.t("status_loaded", name=os.path.basename(file_path)))
             self.size_label.config(text=f"{w} x {h}")
 
             # 适应窗口并触发实时预览
@@ -716,7 +739,7 @@ class SpriteSheetSplitterGUI:
             self.root.after(100, self.on_grid_param_change)
 
         except Exception as e:
-            messagebox.showerror("错误", f"加载图片失败: {e}")
+            messagebox.showerror(i18n.t("title_error"), i18n.t("msg_load_failed", error=str(e)))
 
     def update_preview(self, sprites: list = None, selected_index: int = -1):
         """
@@ -915,8 +938,8 @@ class SpriteSheetSplitterGUI:
             self.update_preview(preview_sprites, self.selected_sprite_index)
 
             # 更新精灵计数显示
-            self.sprite_count_label.config(text=f"预览: {len(preview_sprites)} 个精灵")
-            self.size_label.config(text=f"{img_width} x {img_height}, {len(preview_sprites)} sprites")
+            self.sprite_count_label.config(text=i18n.t("sprite_count_preview", count=len(preview_sprites)))
+            self.size_label.config(text=i18n.t("size_info", w=img_width, h=img_height, count=len(preview_sprites)))
 
         except (ValueError, ZeroDivisionError):
             # 参数无效时只显示图片，不显示网格
@@ -926,7 +949,7 @@ class SpriteSheetSplitterGUI:
     def do_split(self):
         """执行拆分操作 - 使用与预览相同的计算逻辑"""
         if not self.splitter:
-            messagebox.showwarning("警告", "请先加载图片")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_load_image"))
             return
 
         try:
@@ -978,7 +1001,7 @@ class SpriteSheetSplitterGUI:
             elif mode == "data":
                 data_file = self.data_file_var.get()
                 if not data_file:
-                    messagebox.showwarning("警告", "请选择数据文件")
+                    messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_select_data"))
                     return
 
                 sprites = self.splitter.split_by_data_file(data_file)
@@ -990,21 +1013,21 @@ class SpriteSheetSplitterGUI:
                     f"{sprite.name} ({sprite.width}x{sprite.height})")
 
             # 更新计数
-            self.sprite_count_label.config(text=f"共 {len(sprites)} 个精灵")
-            self.size_label.config(text=f"{self.original_image.width} x {self.original_image.height}, {len(sprites)} sprites")
+            self.sprite_count_label.config(text=i18n.t("sprite_count_total", count=len(sprites)))
+            self.size_label.config(text=i18n.t("size_info", w=self.original_image.width, h=self.original_image.height, count=len(sprites)))
 
             # 更新预览
             self.update_preview(sprites)
 
-            self.status_label.config(text=f"拆分完成，共 {len(sprites)} 个精灵")
+            self.status_label.config(text=i18n.t("status_split_complete", count=len(sprites)))
 
         except Exception as e:
-            messagebox.showerror("错误", f"拆分失败: {e}")
+            messagebox.showerror(i18n.t("title_error"), i18n.t("msg_split_failed", error=str(e)))
 
     def save_sprites(self):
         """保存拆分后的精灵"""
         if not self.splitter or not self.splitter.sprites:
-            messagebox.showwarning("警告", "请先执行拆分操作")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_do_split"))
             return
 
         try:
@@ -1015,6 +1038,13 @@ class SpriteSheetSplitterGUI:
             edge_crop = int(self.edge_crop_var.get()) if self.edge_crop_var.get() else 0
             smart_edge = self.smart_edge_var.get()
             remove_bg = self.remove_bg_var.get()
+            restore_source = self.restore_source_var.get()
+            origin_text = self.offset_origin_var.get()
+            origin_map = {
+                i18n.t("offset_origin_top"): "top",
+                i18n.t("offset_origin_bottom"): "bottom",
+            }
+            offset_origin = origin_map.get(origin_text, "top")
 
             # 获取缩放参数
             resize_mode, resize_scale, resize_width, resize_height = self._get_resize_params()
@@ -1030,18 +1060,20 @@ class SpriteSheetSplitterGUI:
                 resize_mode=resize_mode,
                 resize_scale=resize_scale,
                 resize_width=resize_width,
-                resize_height=resize_height
+                resize_height=resize_height,
+                restore_source=restore_source,
+                offset_origin=offset_origin
             )
 
             # 同时导出数据文件
             data_path = os.path.join(output_dir, '_sprites.json')
             self.splitter.export_data_file(data_path)
 
-            self.status_label.config(text=f"已保存 {len(saved_files)} 个精灵到 {output_dir}")
-            messagebox.showinfo("成功", f"已保存 {len(saved_files)} 个精灵到:\n{output_dir}")
+            self.status_label.config(text=i18n.t("status_saved_to", count=len(saved_files), path=output_dir))
+            messagebox.showinfo(i18n.t("title_success"), i18n.t("msg_save_success", count=len(saved_files), path=output_dir))
 
         except Exception as e:
-            messagebox.showerror("错误", f"保存失败: {e}")
+            messagebox.showerror(i18n.t("title_error"), i18n.t("msg_save_failed", error=str(e)))
 
     def _get_resize_params(self):
         """获取缩放参数"""
@@ -1113,7 +1145,7 @@ class SpriteSheetSplitterGUI:
 
         selection = self.sprite_listbox.curselection()
         if not selection:
-            messagebox.showwarning("警告", "请先选中要删除的精灵")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_select_sprite"))
             return
 
         index = selection[0]
@@ -1128,25 +1160,25 @@ class SpriteSheetSplitterGUI:
         self.update_preview(self.splitter.sprites)
 
         # 更新状态
-        self.sprite_count_label.config(text=f"共 {len(self.splitter.sprites)} 个精灵")
-        self.status_label.config(text=f"已删除精灵，剩余 {len(self.splitter.sprites)} 个")
+        self.sprite_count_label.config(text=i18n.t("sprite_count_total", count=len(self.splitter.sprites)))
+        self.status_label.config(text=i18n.t("status_deleted", count=len(self.splitter.sprites)))
 
     def delete_all_sprites(self):
         """删除全部精灵"""
         if not self.splitter or not self.splitter.sprites:
             return
 
-        if messagebox.askyesno("确认", "确定要删除全部精灵吗？"):
+        if messagebox.askyesno(i18n.t("title_confirm"), i18n.t("msg_delete_all")):
             self.splitter.sprites = []
             self.sprite_listbox.delete(0, tk.END)
             self.update_preview(None)
-            self.sprite_count_label.config(text="共 0 个精灵")
-            self.status_label.config(text="已删除全部精灵")
+            self.sprite_count_label.config(text=i18n.t("sprite_count_total", count=0))
+            self.status_label.config(text=i18n.t("status_deleted_all"))
 
     def renumber_sprites(self):
         """重新编号精灵（消除断序）"""
         if not self.splitter or not self.splitter.sprites:
-            messagebox.showwarning("警告", "没有精灵需要编号")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_no_sprites"))
             return
 
         # 使用当前名称模板重新编号
@@ -1170,17 +1202,17 @@ class SpriteSheetSplitterGUI:
 
         # 更新列表显示
         self.update_sprite_list()
-        self.status_label.config(text=f"已重新编号 {len(self.splitter.sprites)} 个精灵")
+        self.status_label.config(text=i18n.t("status_renumbered", count=len(self.splitter.sprites)))
 
     def apply_name_template(self):
         """应用名称模板 - 更新所有精灵的名称"""
         if not self.splitter or not self.splitter.sprites:
-            messagebox.showwarning("警告", "请先执行拆分操作")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_do_split"))
             return
 
         # 调用重新编号功能（使用当前模板）
         self.renumber_sprites()
-        messagebox.showinfo("完成", f"已应用名称模板到 {len(self.splitter.sprites)} 个精灵")
+        messagebox.showinfo(i18n.t("title_complete"), i18n.t("msg_template_applied", count=len(self.splitter.sprites)))
 
     def update_sprite_list(self):
         """更新精灵列表显示"""
@@ -1194,7 +1226,7 @@ class SpriteSheetSplitterGUI:
     def export_data(self):
         """导出数据文件"""
         if not self.splitter or not self.splitter.sprites:
-            messagebox.showwarning("警告", "请先执行拆分操作")
+            messagebox.showwarning(i18n.t("title_warning"), i18n.t("msg_do_split"))
             return
 
         file_path = filedialog.asksaveasfilename(
@@ -1206,9 +1238,9 @@ class SpriteSheetSplitterGUI:
         if file_path:
             try:
                 self.splitter.export_data_file(file_path)
-                self.status_label.config(text=f"数据文件已导出: {file_path}")
+                self.status_label.config(text=i18n.t("status_exported", path=file_path))
             except Exception as e:
-                messagebox.showerror("错误", f"导出失败: {e}")
+                messagebox.showerror(i18n.t("title_error"), i18n.t("msg_export_failed", error=str(e)))
 
     def clear_all(self):
         """清除所有"""
@@ -1227,9 +1259,8 @@ class SpriteSheetSplitterGUI:
         )
 
         self.sprite_listbox.delete(0, tk.END)
-        self.sprite_listbox.delete(0, tk.END)
         self.sprite_count_label.config(text=i18n.t("sprite_count", count=0))
-        self.status_label.config(text="就绪")
+        self.status_label.config(text=i18n.t("status_ready"))
         self.size_label.config(text="")
 
     def on_sprite_select(self, event):
@@ -1240,7 +1271,7 @@ class SpriteSheetSplitterGUI:
             self.selected_sprite_index = index
             sprite = self.splitter.sprites[index]
             self.status_label.config(
-                text=f"选中: {sprite.name} - 位置({sprite.x}, {sprite.y}) 尺寸({sprite.width}x{sprite.height})"
+                text=i18n.t("status_selected", name=sprite.name, x=sprite.x, y=sprite.y, w=sprite.width, h=sprite.height)
             )
             # 重绘预览以显示选中高亮
             self.update_preview(self.splitter.sprites, self.selected_sprite_index)
@@ -1335,7 +1366,7 @@ class SpriteSheetSplitterGUI:
 
                 # 更新状态栏
                 self.status_label.config(
-                    text=f"选中: {sprite.name} - 位置({sprite.x}, {sprite.y}) 尺寸({sprite.width}x{sprite.height})"
+                    text=i18n.t("status_selected", name=sprite.name, x=sprite.x, y=sprite.y, w=sprite.width, h=sprite.height)
                 )
 
                 # 重绘预览
@@ -1395,35 +1426,37 @@ class SpriteSheetSplitterGUI:
 
     def change_language(self, lang: str):
         """切换语言"""
+        if i18n.get_language() == lang:
+            return
+
         i18n.set_language(lang)
 
         # 保存语言配置到用户目录
         save_language_config(lang)
 
-        # 实时更新Canvas提示文本
+        # 实时更新部分关键文本
+        self.root.title(i18n.t("app_title"))
         if self.hint_text:
             self.canvas.itemconfig(self.hint_text, text=i18n.t("preview_hint"))
-
-        # 刷新菜单
         self._create_menu()
 
-        # 更新标题
-        self.root.title(i18n.t("app_title"))
+        # 提示重启以应用全部更改
+        if lang == "zh":
+            msg = "语言已切换为中文。是否现在重启应用以应用全部更改？"
+            title = "语言切换"
+        else:
+            msg = "Language changed to English. Restart now to apply all changes?"
+            title = "Language Changed"
 
-        # 提示用户需要重启应用
-        # 提示用户需要重启应用
-        # if lang == "zh":
-        #     msg = "语言已切换为中文。\n\n部分界面需要重启应用后生效。\n\n是否现在重启？"
-        #     title = "语言切换"
-        # else:
-        #     msg = "Language changed to English.\n\nSome UI changes require restart.\n\nRestart now?"
-        #     title = "Language Changed"
-
-        # if messagebox.askyesno(title, msg):
-        #     # 重启应用
-        #     self.root.destroy()
-        #     python = sys.executable
-        #     os.execl(python, python, *sys.argv)
+        if messagebox.askyesno(title, msg):
+            # 重启应用
+            self.root.destroy()
+            python = sys.executable
+            # 在打包后的环境中 sys.executable 就是可执行文件本身
+            if getattr(sys, 'frozen', False):
+                os.execl(python, python, *sys.argv)
+            else:
+                os.execl(python, python, *sys.argv)
 
 def get_config_path():
     """获取配置文件路径 - 使用用户目录"""
