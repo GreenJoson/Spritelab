@@ -20,7 +20,12 @@ class FitPaddingTests(unittest.TestCase):
     def test_fit_pads_to_target_top(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             image_path = os.path.join(temp_dir, "sheet.png")
-            Image.new("RGBA", (72, 55), (255, 0, 0, 255)).save(image_path)
+            img = Image.new("RGBA", (72, 55), (0, 0, 0, 0))
+            # Put content near the bottom, leaving transparent top area
+            for x in range(10, 62):
+                for y in range(45, 55):
+                    img.putpixel((x, y), (255, 0, 0, 255))
+            img.save(image_path)
 
             splitter = SpriteSplitter(image_path)
             with Image.open(image_path) as handle:
@@ -30,13 +35,23 @@ class FitPaddingTests(unittest.TestCase):
                 )
 
             self.assertEqual(out.size, (75, 75))
-            self.assertEqual(out.getpixel((0, 0))[3], 255)
-            self.assertEqual(out.getpixel((0, 74))[3], 0)
+            # Smart top align: content should touch the top edge
+            alpha = out.split()[-1]
+            bbox = alpha.getbbox()
+            self.assertIsNotNone(bbox)
+            self.assertLessEqual(bbox[1], 1)
+            # Bottom-most line should be transparent (content is only ~10px tall)
+            self.assertEqual(out.getpixel((20, 74))[3], 0)
 
     def test_fit_pads_to_target_bottom(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             image_path = os.path.join(temp_dir, "sheet.png")
-            Image.new("RGBA", (72, 55), (255, 0, 0, 255)).save(image_path)
+            img = Image.new("RGBA", (72, 55), (0, 0, 0, 0))
+            # Put content near the top, leaving transparent bottom area
+            for x in range(10, 62):
+                for y in range(0, 10):
+                    img.putpixel((x, y), (255, 0, 0, 255))
+            img.save(image_path)
 
             splitter = SpriteSplitter(image_path)
             with Image.open(image_path) as handle:
@@ -46,8 +61,12 @@ class FitPaddingTests(unittest.TestCase):
                 )
 
             self.assertEqual(out.size, (75, 75))
-            self.assertEqual(out.getpixel((0, 0))[3], 0)
-            self.assertEqual(out.getpixel((0, 74))[3], 255)
+            # Smart bottom align: content should touch the bottom edge
+            alpha = out.split()[-1]
+            bbox = alpha.getbbox()
+            self.assertIsNotNone(bbox)
+            self.assertGreaterEqual(bbox[3], 74)
+            self.assertEqual(out.getpixel((20, 0))[3], 0)
 
 
 if __name__ == "__main__":

@@ -851,10 +851,24 @@ class SpriteSplitter:
             canvas = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
             paste_x = 0
 
-            if origin_mode == "bottom":
-                paste_y = max(0, target_height - resized.size[1])
+            # 使用 alpha 通道 bbox 来做“智能补边对齐”，避免因为原始矩形里包含透明边导致脚底上下抖动
+            alpha = resized.split()[-1]
+            # 抗锯齿会在边缘产生极小 alpha，直接用 getbbox 会导致对齐抖动
+            # 这里做一个轻量阈值化，让 bbox 更接近“肉眼看到的实体边界”
+            alpha_threshold = 10
+            alpha_mask = alpha.point(lambda p: 255 if p > alpha_threshold else 0)
+            bbox = alpha_mask.getbbox()  # (left, top, right, bottom) in resized space
+
+            if bbox:
+                bbox_top = bbox[1]
+                bbox_bottom = bbox[3]
+                if origin_mode == "bottom":
+                    paste_y = target_height - bbox_bottom
+                else:
+                    paste_y = -bbox_top
             else:
-                paste_y = 0
+                # 全透明：退化为简单对齐
+                paste_y = target_height - resized.size[1] if origin_mode == "bottom" else 0
 
             canvas.paste(resized, (paste_x, paste_y), resized)
             return canvas
