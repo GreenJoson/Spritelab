@@ -41,6 +41,7 @@ description: SpriteLab（桌面端）发布与官网同步的默认工作流（C
 
 ### 1.5 自动替换本机 macOS App（必须）
 
+- **优先本地打包产物覆盖**：如果你本地已经完成 PyInstaller 打包（`dist/SpriteLab.app` 已生成），直接用它覆盖 `/Applications/SpriteLab.app`，不需要再从 GitHub 下载再覆盖（除非你需要 CI 产物/签名产物）。
 - 下载并覆盖安装到 `/Applications/SpriteLab.app`：
   - `gh release download vX.Y.Z -p SpriteLab-macOS.zip`
   - `unzip SpriteLab-macOS.zip`
@@ -67,4 +68,3 @@ description: SpriteLab（桌面端）发布与官网同步的默认工作流（C
   - macOS：`--icon icon.icns`
   - Windows：`--icon icon.ico`
 - `icon.icns` / `icon.ico` 必须存在且随仓库管理。
-
