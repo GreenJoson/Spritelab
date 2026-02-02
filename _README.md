@@ -8,6 +8,7 @@
 | gui.py | 核心 | Tkinter 图形界面与交互（输出设置布局/数据文件刷新） |
 | i18n.py | 基础 | 多语言文案管理 |
 | README.md | 文档 | 使用说明与功能概览 |
+| icon.icns / icon.ico | 资源 | 应用图标（macOS/Windows 打包） |
 | tests/test_restore_mode.py | 测试 | Data File 还原尺寸回归测试 |
 | tests/test_name_template.py | 测试 | 空模板命名回退测试 |
 | tests/test_res_mc_format.py | 测试 | res/mc JSON 解析测试 |

@@ -28,7 +28,7 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --noconfirm --windowed --name "SpriteLab" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
+        pyinstaller --noconfirm --windowed --name "SpriteLab" --icon "icon.ico" --add-data "sprite_splitter.py;." --add-data "i18n.py;." gui.py
 
     - name: Zip Windows Artifact
       run: |
@@ -58,7 +58,7 @@ jobs:
 
     - name: Build with PyInstaller
       run: |
-        pyinstaller --noconfirm --windowed --name "SpriteLab" --add-data "sprite_splitter.py:." --add-data "i18n.py:." gui.py
+        pyinstaller --noconfirm --windowed --name "SpriteLab" --icon "icon.icns" --add-data "sprite_splitter.py:." --add-data "i18n.py:." gui.py
 
     - name: Zip macOS Artifact
       run: |
