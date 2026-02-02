@@ -2,7 +2,7 @@
 """
 @input  依赖：Pillow, i18n
 @output 导出：SpriteSplitter, SpriteRect
-@pos    精灵表拆分的核心逻辑
+@pos    精灵表拆分的核心逻辑（含导出批量缩放：fit 等比缩放 + 透明补边）
 
 ⚠️ 一旦本文件被更新，务必更新以上注释
 
@@ -97,10 +97,14 @@ class SpriteSplitter:
         if not os.path.exists(self.image_path):
             raise FileNotFoundError(f"找不到图片文件: {self.image_path}")
 
-        self.image = Image.open(self.image_path)
-        # 确保图片有alpha通道
-        if self.image.mode != 'RGBA':
-            self.image = self.image.convert('RGBA')
+        # Pillow 会延迟读取像素数据；这里强制加载并断开文件句柄，避免导出/测试阶段资源泄漏
+        with Image.open(self.image_path) as handle:
+            if handle.mode != "RGBA":
+                loaded = handle.convert("RGBA")
+            else:
+                loaded = handle.copy()
+            loaded.load()
+            self.image = loaded
 
         print(f"✓ 已加载图片: {self.image_path}")
         print(f"  尺寸: {self.image.width} x {self.image.height}")
@@ -560,7 +564,7 @@ class SpriteSplitter:
             edge_crop: 边缘裁剪像素数（上下左右各裁剪N像素）
             smart_edge_detect: 智能边缘检测，自动移除边缘纯色分隔线
             remove_bg: 智能去除边缘纯色背景
-            resize_mode: 缩放模式 - "none"(不缩放), "scale"(按比例), "width"(固定宽度), "height"(固定高度), "custom"(自定义)
+            resize_mode: 缩放模式 - "none"(不缩放), "scale"(按比例), "width"(固定宽度), "height"(固定高度), "custom"(自定义), "fit"(等比适应并透明补边到目标尺寸)
             resize_scale: 缩放比例 (当resize_mode为"scale"时使用)
             resize_width: 目标宽度 (当resize_mode为"width"或"custom"时使用)
             resize_height: 目标高度 (当resize_mode为"height"或"custom"时使用)
@@ -647,7 +651,7 @@ class SpriteSplitter:
             # 批量调整大小
             if resize_mode != "none" and sprite_img.size[0] > 0 and sprite_img.size[1] > 0:
                 sprite_img = self._resize_image(
-                    sprite_img, resize_mode, resize_scale, resize_width, resize_height
+                    sprite_img, resize_mode, resize_scale, resize_width, resize_height, origin_mode
                 )
 
             # 生成文件名 - 使用手动替换以支持更灵活的模板
@@ -778,17 +782,19 @@ class SpriteSplitter:
         mode: str,
         scale: float,
         target_width: int,
-        target_height: int
+        target_height: int,
+        origin_mode: str = "top",
     ) -> Image.Image:
         """
         调整图像大小
 
         Args:
             img: 输入图片
-            mode: 缩放模式 - "scale"(按比例), "width"(固定宽度), "height"(固定高度), "custom"(自定义)
+            mode: 缩放模式 - "scale"(按比例), "width"(固定宽度), "height"(固定高度), "custom"(自定义), "fit"(等比适应并补边)
             scale: 缩放比例 (0.5 = 50%, 2.0 = 200%)
             target_width: 目标宽度
             target_height: 目标高度
+            origin_mode: 贴图原点（"top" 或 "bottom"），用于fit模式的透明补边对齐
 
         Returns:
             调整大小后的图片
@@ -818,10 +824,10 @@ class SpriteSplitter:
             new_height = target_height
 
         elif mode == "fit" and target_width > 0 and target_height > 0:
-            # 适应尺寸（保持宽高比，不超过目标尺寸）
+            # 适应尺寸（保持宽高比）并透明补边到固定画布尺寸，避免导出帧一高一矮
             ratio = min(target_width / orig_width, target_height / orig_height)
-            new_width = int(orig_width * ratio)
-            new_height = int(orig_height * ratio)
+            new_width = min(target_width, int(orig_width * ratio))
+            new_height = min(target_height, int(orig_height * ratio))
 
         else:
             # 无效参数，返回原图
@@ -832,7 +838,28 @@ class SpriteSplitter:
         new_height = max(1, new_height)
 
         # 使用高质量缩放
-        return img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        # fit模式：补透明边到目标画布（输出严格等于target_width/target_height）
+        if mode == "fit":
+            if resized.size == (target_width, target_height):
+                return resized
+
+            if resized.mode != "RGBA":
+                resized = resized.convert("RGBA")
+
+            canvas = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
+            paste_x = 0
+
+            if origin_mode == "bottom":
+                paste_y = max(0, target_height - resized.size[1])
+            else:
+                paste_y = 0
+
+            canvas.paste(resized, (paste_x, paste_y), resized)
+            return canvas
+
+        return resized
 
     def _remove_edge_background(self, img: Image.Image, tolerance: int = 30) -> Image.Image:
         """
