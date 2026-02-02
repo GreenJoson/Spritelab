@@ -2,7 +2,7 @@
 """
 @input  依赖：tkinter, SpriteSplitter
 @output 导出：SpriteSplitterGUI
-@pos    图形界面入口与交互逻辑（数据文件切换自动刷新）
+@pos    图形界面入口与交互逻辑（含fit缩放补边对齐选项）
 
 ⚠️ 一旦本文件被更新，务必更新以上注释
 
@@ -536,7 +536,43 @@ class SpriteSheetSplitterGUI:
         ratio_row = ttk.Frame(self.size_frame)
         ratio_row.pack(fill=tk.X, pady=2)
         self.keep_ratio_var = tk.BooleanVar(value=True)
-        ttk.Checkbutton(ratio_row, text=i18n.t("keep_ratio"), variable=self.keep_ratio_var).pack(side=tk.LEFT)
+        ttk.Checkbutton(
+            ratio_row,
+            text=i18n.t("keep_ratio"),
+            variable=self.keep_ratio_var,
+            command=self._update_pad_frame_visibility,
+        ).pack(side=tk.LEFT)
+
+        # fit补边设置：仅在“自定义尺寸 + 保持宽高比(fit)”时生效
+        self.pad_frame = ttk.Frame(self.size_frame)
+
+        pad_row = ttk.Frame(self.pad_frame)
+        pad_row.pack(fill=tk.X, pady=2)
+        ttk.Label(pad_row, text=i18n.t("pad_align"), width=10).pack(side=tk.LEFT)
+        self.pad_align_var = tk.StringVar(value=i18n.t("pad_align_bottom_left"))
+        pad_align_combo = ttk.Combobox(
+            pad_row,
+            textvariable=self.pad_align_var,
+            values=[
+                i18n.t("pad_align_top_left"),
+                i18n.t("pad_align_top_center"),
+                i18n.t("pad_align_top_right"),
+                i18n.t("pad_align_center_left"),
+                i18n.t("pad_align_center"),
+                i18n.t("pad_align_center_right"),
+                i18n.t("pad_align_bottom_left"),
+                i18n.t("pad_align_bottom_center"),
+                i18n.t("pad_align_bottom_right"),
+            ],
+            width=12,
+            state="readonly",
+        )
+        pad_align_combo.pack(side=tk.LEFT, padx=5)
+
+        pad_row2 = ttk.Frame(self.pad_frame)
+        pad_row2.pack(fill=tk.X, pady=2)
+        self.pad_smart_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(pad_row2, text=i18n.t("pad_smart"), variable=self.pad_smart_var).pack(side=tk.LEFT)
 
 
         # 保存按钮
@@ -1049,7 +1085,7 @@ class SpriteSheetSplitterGUI:
             offset_origin = origin_map.get(origin_text, "top")
 
             # 获取缩放参数
-            resize_mode, resize_scale, resize_width, resize_height = self._get_resize_params()
+            resize_mode, resize_scale, resize_width, resize_height, pad_align, pad_smart = self._get_resize_params()
 
             saved_files = self.splitter.save_sprites(
                 output_dir=output_dir,
@@ -1063,6 +1099,8 @@ class SpriteSheetSplitterGUI:
                 resize_scale=resize_scale,
                 resize_width=resize_width,
                 resize_height=resize_height,
+                pad_align=pad_align,
+                pad_smart=pad_smart,
                 restore_source=restore_source,
                 offset_origin=offset_origin
             )
@@ -1109,7 +1147,22 @@ class SpriteSheetSplitterGUI:
         except:
             resize_height = 0
 
-        return resize_mode, resize_scale, resize_width, resize_height
+        pad_align_text = self.pad_align_var.get() if hasattr(self, "pad_align_var") else i18n.t("pad_align_bottom_left")
+        pad_align_map = {
+            i18n.t("pad_align_top_left"): "top_left",
+            i18n.t("pad_align_top_center"): "top_center",
+            i18n.t("pad_align_top_right"): "top_right",
+            i18n.t("pad_align_center_left"): "center_left",
+            i18n.t("pad_align_center"): "center",
+            i18n.t("pad_align_center_right"): "center_right",
+            i18n.t("pad_align_bottom_left"): "bottom_left",
+            i18n.t("pad_align_bottom_center"): "bottom_center",
+            i18n.t("pad_align_bottom_right"): "bottom_right",
+        }
+        pad_align = pad_align_map.get(pad_align_text, "bottom_left")
+        pad_smart = bool(self.pad_smart_var.get()) if hasattr(self, "pad_smart_var") else True
+
+        return resize_mode, resize_scale, resize_width, resize_height, pad_align, pad_smart
 
     def on_resize_mode_change(self, event=None):
         """缩放模式改变时显示/隐藏相应的输入框"""
@@ -1124,6 +1177,16 @@ class SpriteSheetSplitterGUI:
             self.scale_frame.pack(fill=tk.X, pady=2)
         elif mode_text == i18n.t("resize_custom"):
             self.size_frame.pack(fill=tk.X, pady=2)
+            self._update_pad_frame_visibility()
+
+    def _update_pad_frame_visibility(self):
+        """仅在fit模式（自定义尺寸 + 保持宽高比）时显示补边对齐选项"""
+        if not hasattr(self, "pad_frame"):
+            return
+        if self.resize_mode_var.get() == i18n.t("resize_custom") and self.keep_ratio_var.get():
+            self.pad_frame.pack(fill=tk.X, pady=2)
+        else:
+            self.pad_frame.pack_forget()
 
 
     def show_sprite_context_menu(self, event):

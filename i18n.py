@@ -14,7 +14,7 @@
 LANGUAGES = {
     "zh": {
         # 窗口标题
-        "app_title": "SpriteLab v1.0.17 - 精灵表拆分器 | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.18 - 精灵表拆分器 | SpriteLab.app",
 
         # 菜单
         "menu_file": "文件",
@@ -108,6 +108,17 @@ LANGUAGES = {
         "target_width": "宽度:",
         "target_height": "高度:",
         "keep_ratio": "保持宽高比",
+        "pad_align": "补边对齐:",
+        "pad_smart": "智能补边（按不透明像素对齐）",
+        "pad_align_top_left": "左上",
+        "pad_align_top_center": "中上",
+        "pad_align_top_right": "右上",
+        "pad_align_center_left": "左中",
+        "pad_align_center": "居中",
+        "pad_align_center_right": "右中",
+        "pad_align_bottom_left": "左下",
+        "pad_align_bottom_center": "中下",
+        "pad_align_bottom_right": "右下",
 
         # 状态栏
         "status_ready": "就绪",
@@ -168,7 +179,7 @@ LANGUAGES = {
         # 帮助
         "help_title": "使用说明",
         "about_title": "关于",
-        "opensource_hint": "免费版 v1.0.17 | SpriteLab.app",
+        "opensource_hint": "免费版 v1.0.18 | SpriteLab.app",
 
         # 预览提示
         "preview_hint": "双击此处打开图片\n或使用 Cmd+V 粘贴图片路径\n或点击'打开图片'按钮",
@@ -239,7 +250,7 @@ LANGUAGES = {
 
     "en": {
         # Window title
-        "app_title": "SpriteLab v1.0.17 - Sprite Sheet Splitter | SpriteLab.app",
+        "app_title": "SpriteLab v1.0.18 - Sprite Sheet Splitter | SpriteLab.app",
 
         # Menu
         "menu_file": "File",
@@ -333,6 +344,17 @@ LANGUAGES = {
         "target_width": "Width:",
         "target_height": "Height:",
         "keep_ratio": "Keep Aspect Ratio",
+        "pad_align": "Pad Align:",
+        "pad_smart": "Smart padding (use opaque bbox)",
+        "pad_align_top_left": "Top-Left",
+        "pad_align_top_center": "Top-Center",
+        "pad_align_top_right": "Top-Right",
+        "pad_align_center_left": "Center-Left",
+        "pad_align_center": "Center",
+        "pad_align_center_right": "Center-Right",
+        "pad_align_bottom_left": "Bottom-Left",
+        "pad_align_bottom_center": "Bottom-Center",
+        "pad_align_bottom_right": "Bottom-Right",
 
         # Status Bar
         "status_ready": "Ready",
@@ -390,7 +412,7 @@ LANGUAGES = {
         # Help
         "help_title": "Usage Guide",
         "about_title": "About",
-        "opensource_hint": "Free Version v1.0.17 | SpriteLab.app",
+        "opensource_hint": "Free Version v1.0.18 | SpriteLab.app",
 
         # Preview hint
         "preview_hint": "Double-click to open image\nor use Cmd+V to paste image path\nor click 'Open Image' button",

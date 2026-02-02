@@ -2,7 +2,7 @@
 """
 @input  依赖：Pillow, i18n
 @output 导出：SpriteSplitter, SpriteRect
-@pos    精灵表拆分的核心逻辑（含导出批量缩放：fit 等比缩放 + 透明补边）
+@pos    精灵表拆分的核心逻辑（含导出批量缩放：fit 等比缩放 + 智能透明补边对齐）
 
 ⚠️ 一旦本文件被更新，务必更新以上注释
 
@@ -550,6 +550,8 @@ class SpriteSplitter:
         resize_scale: float = 1.0,
         resize_width: int = 0,
         resize_height: int = 0,
+        pad_align: str = "top_left",
+        pad_smart: bool = True,
         restore_source: Optional[bool] = None,
         offset_origin: Optional[str] = None
     ) -> List[str]:
@@ -568,6 +570,8 @@ class SpriteSplitter:
             resize_scale: 缩放比例 (当resize_mode为"scale"时使用)
             resize_width: 目标宽度 (当resize_mode为"width"或"custom"时使用)
             resize_height: 目标高度 (当resize_mode为"height"或"custom"时使用)
+            pad_align: fit模式补边对齐 - "top_left"|"top_center"|"top_right"|"center_left"|"center"|"center_right"|"bottom_left"|"bottom_center"|"bottom_right"
+            pad_smart: 是否启用智能补边（按不透明像素bbox对齐，减少脚底抖动）
             restore_source: 是否还原原始尺寸（offX/offY/sourceW/sourceH）
             offset_origin: 偏移原点（"top" 或 "bottom"）
 
@@ -651,7 +655,7 @@ class SpriteSplitter:
             # 批量调整大小
             if resize_mode != "none" and sprite_img.size[0] > 0 and sprite_img.size[1] > 0:
                 sprite_img = self._resize_image(
-                    sprite_img, resize_mode, resize_scale, resize_width, resize_height, origin_mode
+                    sprite_img, resize_mode, resize_scale, resize_width, resize_height, pad_align, pad_smart
                 )
 
             # 生成文件名 - 使用手动替换以支持更灵活的模板
@@ -783,7 +787,8 @@ class SpriteSplitter:
         scale: float,
         target_width: int,
         target_height: int,
-        origin_mode: str = "top",
+        pad_align: str = "top_left",
+        pad_smart: bool = True,
     ) -> Image.Image:
         """
         调整图像大小
@@ -794,7 +799,8 @@ class SpriteSplitter:
             scale: 缩放比例 (0.5 = 50%, 2.0 = 200%)
             target_width: 目标宽度
             target_height: 目标高度
-            origin_mode: 贴图原点（"top" 或 "bottom"），用于fit模式的透明补边对齐
+            pad_align: fit模式补边对齐
+            pad_smart: 是否启用智能补边（按不透明像素bbox对齐）
 
         Returns:
             调整大小后的图片
@@ -849,26 +855,50 @@ class SpriteSplitter:
                 resized = resized.convert("RGBA")
 
             canvas = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
-            paste_x = 0
 
-            # 使用 alpha 通道 bbox 来做“智能补边对齐”，避免因为原始矩形里包含透明边导致脚底上下抖动
-            alpha = resized.split()[-1]
-            # 抗锯齿会在边缘产生极小 alpha，直接用 getbbox 会导致对齐抖动
-            # 这里做一个轻量阈值化，让 bbox 更接近“肉眼看到的实体边界”
-            alpha_threshold = 10
-            alpha_mask = alpha.point(lambda p: 255 if p > alpha_threshold else 0)
-            bbox = alpha_mask.getbbox()  # (left, top, right, bottom) in resized space
-
-            if bbox:
-                bbox_top = bbox[1]
-                bbox_bottom = bbox[3]
-                if origin_mode == "bottom":
-                    paste_y = target_height - bbox_bottom
-                else:
-                    paste_y = -bbox_top
+            if pad_smart:
+                # 使用 alpha 通道 bbox 来做“智能补边对齐”，避免因为原始矩形里包含透明边导致脚底上下抖动
+                alpha = resized.split()[-1]
+                # 抗锯齿会在边缘产生极小 alpha，直接用 getbbox 会导致对齐抖动
+                # 这里做一个轻量阈值化，让 bbox 更接近“肉眼看到的实体边界”
+                alpha_threshold = 10
+                alpha_mask = alpha.point(lambda p: 255 if p > alpha_threshold else 0)
+                bbox = alpha_mask.getbbox()
             else:
+                bbox = (0, 0, resized.size[0], resized.size[1])
+
+            if not bbox:
                 # 全透明：退化为简单对齐
-                paste_y = target_height - resized.size[1] if origin_mode == "bottom" else 0
+                bbox = (0, 0, resized.size[0], resized.size[1])
+
+            l, t, r, b = bbox
+            content_w = max(1, r - l)
+            content_h = max(1, b - t)
+
+            align = (pad_align or "top_left").lower()
+            h_align = "left"
+            v_align = "top"
+            if "_" in align:
+                v_align, h_align = align.split("_", 1)
+            elif align in {"center", "middle"}:
+                v_align, h_align = "center", "center"
+
+            if h_align == "right":
+                target_left = target_width - content_w
+            elif h_align == "center":
+                target_left = (target_width - content_w) // 2
+            else:
+                target_left = 0
+
+            if v_align == "bottom":
+                target_top = target_height - content_h
+            elif v_align == "center":
+                target_top = (target_height - content_h) // 2
+            else:
+                target_top = 0
+
+            paste_x = int(target_left - l)
+            paste_y = int(target_top - t)
 
             canvas.paste(resized, (paste_x, paste_y), resized)
             return canvas

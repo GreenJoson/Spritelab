@@ -13,7 +13,7 @@ import urllib.error
 from typing import Optional, Dict, Any, Callable
 
 # 当前版本
-CURRENT_VERSION = "v1.0.17"
+CURRENT_VERSION = "v1.0.18"
 
 # API 地址
 UPDATE_API_URL = "https://spritelab.app/api/version"

@@ -31,7 +31,7 @@ class FitPaddingTests(unittest.TestCase):
             with Image.open(image_path) as handle:
                 img = handle.convert("RGBA")
                 out = splitter._resize_image(
-                    img, mode="fit", scale=1.0, target_width=75, target_height=75, origin_mode="top"
+                    img, mode="fit", scale=1.0, target_width=75, target_height=75, pad_align="top_left", pad_smart=True
                 )
 
             self.assertEqual(out.size, (75, 75))
@@ -57,7 +57,7 @@ class FitPaddingTests(unittest.TestCase):
             with Image.open(image_path) as handle:
                 img = handle.convert("RGBA")
                 out = splitter._resize_image(
-                    img, mode="fit", scale=1.0, target_width=75, target_height=75, origin_mode="bottom"
+                    img, mode="fit", scale=1.0, target_width=75, target_height=75, pad_align="bottom_left", pad_smart=True
                 )
 
             self.assertEqual(out.size, (75, 75))
